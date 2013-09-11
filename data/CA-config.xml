@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
     contains foot params for Certificate Authority.
 
@@ -5,7 +6,6 @@
 
     Has to be serialized into text representation (vars) for easy-rsa
 -->
-
 <CA>
     <!-- iso -->
     <country/>

@@ -2,12 +2,25 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <title/>
+        <link rel="stylesheet" href="resources/css/styles.css"/>
     </head>
     <body>
-        <div class="container">
-            <form>
-                <input type="text" name=""
-            </form>
+        <menu type="toolbar">
+            <button id="config">Config</button>
+            <button id="certs">Certificates</button>
+        </menu>
+        <div class="cert-list">
+            <ul>
+                <li/>
+                <li/>
+                <li/>
+            </ul>
+            ...certs here...
         </div>
+        <menu type="toolbar">
+            <button id="create">Create</button>
+            <button id="renew" disabled="disabled">Renew</button>
+            <button id="revoke" disabled="disabled">Revoke</button>
+        </menu>
     </body>
 </html>
