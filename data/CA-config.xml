@@ -1,0 +1,32 @@
+<!--
+    contains foot params for Certificate Authority.
+
+    Will be used to create Server and Client certs.
+
+    Has to be serialized into text representation (vars) for easy-rsa
+-->
+
+<CA>
+    <!-- iso -->
+    <country/>
+    <province/>
+    <city/>
+    <org/>
+    <unit/>
+    <CA-email/>
+    <expire/>
+    <pass/>
+    <server-certs>
+        <server-dns-name/>
+    </server-certs>
+    <client-certs>
+        <email/>
+        <pass/>
+        <expiry/>
+    </client-certs>
+    <defaults>
+        <client-cert-expiry/>
+        <server-cert-expiry/>
+        <CA-expiry/>
+    </defaults>
+</CA>
