@@ -6,21 +6,50 @@
     </head>
     <body>
         <menu type="toolbar">
-            <button id="config">Config</button>
+            <button id="config" class="selected-button">Config</button>
             <button id="certs">Certificates</button>
         </menu>
-        <div class="cert-list">
-            <ul>
-                <li/>
-                <li/>
-                <li/>
-            </ul>
-            ...certs here...
+        <div class="bf-panel">
+            <form id="CAconfig">
+                <div class="form-label">Root Certificate Configuration</div>
+                <ul>
+                    <li>
+                        <input type="text" id="caOrg" name="caOrg" required="required" placeHolder="Organisation"/>
+                    </li>
+                    <li>
+                        <input type="text" id="caUnit" placeholder="Organisational Unit"/>
+                    </li>
+                    <li>
+                        <input type="text" id="caState" name="caState" placeholder="State / Province"/>
+                    </li>
+                    <li>
+                        <input type="text" id="caCity" name="caCity" required="required" placeholder="City"/>
+                    </li>
+                    <li>
+                        <input type="text" id="caCountry" name="caCountry" required="required" placeholder="Country"/>
+                    </li>
+                    <li>
+                        <input type="password" id="caPass" name="caPass" required="required" placeholder="Password"/>
+                    </li>
+                    <li>
+                        <input type="password" id="caRetype" name="caRetype" required="required" placeholder="Retype"/>
+                    </li>
+                    <li>
+                        <button type="submit" id="save-ca">Create</button>
+                    </li>
+                </ul>
+            </form>
+<!--            <ul>-->
+<!--                <li/>-->
+<!--                <li/>-->
+<!--                <li/>-->
+<!--            </ul>-->
         </div>
-        <menu type="toolbar">
-            <button id="create">Create</button>
-            <button id="renew" disabled="disabled">Renew</button>
-            <button id="revoke" disabled="disabled">Revoke</button>
-        </menu>
+        
+<!--        <menu type="toolbar">-->
+<!--            <button id="create">Create</button>-->
+<!--            <button id="renew" disabled="disabled">Renew</button>-->
+<!--            <button id="revoke" disabled="disabled">Revoke</button>-->
+<!--        </menu>-->
     </body>
 </html>
