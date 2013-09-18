@@ -6,7 +6,7 @@
     </head>
     <body>
         <menu type="toolbar">
-            <button id="config" class="selected-button">Config</button>
+            <button id="config" class="selected-button">Configuration</button>
             <button id="certs">Certificates</button>
         </menu>
         <div class="bf-panel">
@@ -33,6 +33,12 @@
                     </li>
                     <li>
                         <input type="password" id="caRetype" name="caRetype" required="required" placeholder="Retype"/>
+                    </li>
+                    <li>
+                        <input type="email" id="caMail" name="caMail" placeHolder="Email"/>
+                    </li>
+                    <li>
+                        <input type="date" id="caExpiry" name="caExpiry" placeHolder="Expires" required="required"/>
                     </li>
                     <li>
                         <button type="submit" id="save-ca">Create</button>

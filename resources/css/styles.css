@@ -95,6 +95,9 @@ ul {
   float: left;
   padding: 2px;
 }
+.bf-panel input:required {
+  font-weight: bold;
+}
 .bf-panel #save-ca {
   border-bottom-left-radius: 10px;
   border-top-right-radius: 10px;
