@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xf="http://www.w3.org/2002/xforms">
+    <head>
+        <title/>
+        <link rel="stylesheet" href="resources/css/styles.css"/>
+    </head>
+    <body class="xforms">
+        <div style="display:none;">
+            <xf:model id="m-ca">
+                <xf:instance xmlns="" src="data/CA-config.xml"/>
+                <xf:bind ref="org" required="true()"/>
+                <xf:bind ref="city" required="true()"/>
+                <xf:bind ref="caCountry" required="true()"/>
+                <xf:bind ref="caPass" required="true()"/>
+                <xf:bind ref="caExpiry" required="true()" />
+
+                <xf:submission id="s-createCA" method="post" replace="none" resource="modules/create-ca.xql">
+                    <xf:action ev:event="xforms-submit-error">
+                        <xf:message>Something went terribly wrong</xf:message>
+                    </xf:action>
+                </xf:submission>
+
+                <xf:instance xmlns="" id="i-vars">
+                    <data>
+                        <retype/>
+                    </data>
+                </xf:instance>
+                <xf:bind ref="instance('i-vars')">
+                    <xf:bind ref="retype" constraint=". = instance()/caPass" required="true()"/>
+                </xf:bind>
+
+            </xf:model>
+        </div>
+        <menu type="toolbar">
+            <button id="config" class="selected-button">Configuration</button>
+            <button id="certs">Certificates</button>
+        </menu>
+        <div class="bf-panel">
+            <xf:group appearance="full">
+                <div class="form-label">Root Certificate Configuration</div>
+                <ul>
+                    <li>
+                        <xf:input ref="org">
+                            <xf:label>Organisation</xf:label>
+                        </xf:input>
+                    </li>
+                    <li>
+                        <xf:input ref="unit">
+                            <xf:label>Organisational Unit</xf:label>
+                        </xf:input>
+                    </li>
+                    <li>
+                        <xf:input ref="province">
+                            <xf:label>State / Province</xf:label>
+                        </xf:input>
+                    </li>
+                    <li>
+                        <xf:input ref="city">
+                            <xf:label>City</xf:label>
+                        </xf:input>
+                    </li>
+                    <li>
+                        <xf:input ref="country">
+                            <xf:label>Country</xf:label>
+                        </xf:input>
+                    </li>
+                    <li>
+                        <xf:secret ref="pass">
+                            <xf:label>Password</xf:label>
+                        </xf:secret>
+                    </li>
+                    <li>
+                        <xf:secret ref="instance('i-vars')/retype">
+                            <xf:label>Retype</xf:label>
+                        </xf:secret>
+                    </li>
+                    <li>
+                        <xf:input ref="CA-email">
+                            <xf:label>Email</xf:label>
+                        </xf:input>
+                    </li>
+                    <li>
+                        <xf:input ref="expire">
+                            <xf:label>expires</xf:label>
+                        </xf:input>
+                    </li>
+                    <li>
+                        <xf:trigger>
+                            <xf:label>Create</xf:label>
+                            <xf:send submission="s-createCA"/>
+                        </xf:trigger>
+                    </li>
+                </ul>
+            </xf:group>
+<!--            <ul>-->
+<!--                <li/>-->
+<!--                <li/>-->
+<!--                <li/>-->
+<!--            </ul>-->
+        </div>
+        
+<!--        <menu type="toolbar">-->
+<!--            <button id="create">Create</button>-->
+<!--            <button id="renew" disabled="disabled">Renew</button>-->
+<!--            <button id="revoke" disabled="disabled">Revoke</button>-->
+<!--        </menu>-->
+    </body>
+</html>

@@ -11,5 +11,5 @@
     <target>eXistCA</target>
     <prepare>pre-install.xql</prepare>
     <finish/>
-    <deployed>2013-09-11T23:41:01.296+02:00</deployed>
+    <deployed>2013-11-01T13:04:21.703+01:00</deployed>
 </meta>
