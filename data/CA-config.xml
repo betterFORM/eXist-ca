@@ -8,25 +8,29 @@
 -->
 <CA>
     <!-- iso -->
-    <country/>
+    <!-- 2 letter country-code -->
+    <country>DE</country>
     <province/>
     <city/>
     <org/>
-    <unit/>
-    <CA-email/>
-    <expire/>
+    <org-unit/>
+    <email/>
+    <expire-days>1825</expire-days>
     <pass/>
+    <!-- list of fixed values for key-size 1024, 2048... -->
+    <key-size>2048</key-size>
     <server-certs>
         <server-dns-name/>
     </server-certs>
     <client-certs>
-        <email/>
-        <pass/>
-        <expiry/>
+        <cert>
+            <email/>
+            <pass/>
+            <expiry/>
+        </cert>
     </client-certs>
     <defaults>
-        <client-cert-expiry/>
-        <server-cert-expiry/>
-        <CA-expiry/>
+        <client expire=""/>
+        <server expire=""/>
     </defaults>
 </CA>

@@ -9,17 +9,15 @@
             <xf:model id="m-ca">
                 <xf:instance xmlns="" src="data/CA-config.xml"/>
                 <xf:bind ref="org" required="true()"/>
-                <xf:bind ref="city" required="true()"/>
-                <xf:bind ref="caCountry" required="true()"/>
-                <xf:bind ref="caPass" required="true()"/>
-                <xf:bind ref="caExpiry" required="true()" />
-
+                <xf:bind ref="country" required="true()"/>
+                <xf:bind ref="pass" required="true()"/>
+                <xf:bind ref="key-size" required="true()"/>
+                <xf:bind ref="expire-days" required="true()" type="integer"/>
                 <xf:submission id="s-createCA" method="post" replace="none" resource="modules/create-ca.xql">
                     <xf:action ev:event="xforms-submit-error">
                         <xf:message>Something went terribly wrong</xf:message>
                     </xf:action>
                 </xf:submission>
-
                 <xf:instance xmlns="" id="i-vars">
                     <data>
                         <retype/>
@@ -28,7 +26,7 @@
                 <xf:bind ref="instance('i-vars')">
                     <xf:bind ref="retype" constraint=". = instance()/caPass" required="true()"/>
                 </xf:bind>
-
+                <xf:instance xmlns="" id="i-countries" src="data/countries.xml"/>
             </xf:model>
         </div>
         <menu type="toolbar">
@@ -37,7 +35,7 @@
         </menu>
         <div class="bf-panel">
             <xf:group appearance="full">
-                <div class="form-label">Root Certificate Configuration</div>
+                <div class="form-label">Certificate Authority Configuration</div>
                 <ul>
                     <li>
                         <xf:input ref="org">
@@ -45,7 +43,7 @@
                         </xf:input>
                     </li>
                     <li>
-                        <xf:input ref="unit">
+                        <xf:input ref="org-unit">
                             <xf:label>Organisational Unit</xf:label>
                         </xf:input>
                     </li>
@@ -60,29 +58,70 @@
                         </xf:input>
                     </li>
                     <li>
-                        <xf:input ref="country">
+                        <xf:select1 ref="country" appearance="minimal">
                             <xf:label>Country</xf:label>
-                        </xf:input>
+                            <xf:itemset nodeset="instance('i-countries')/country">
+                                <xf:label ref="."/>
+                                <xf:value ref="@code"/>
+                            </xf:itemset>
+                        </xf:select1>
                     </li>
                     <li>
                         <xf:secret ref="pass">
-                            <xf:label>Password</xf:label>
+                            <xf:label>CA Password</xf:label>
                         </xf:secret>
                     </li>
                     <li>
                         <xf:secret ref="instance('i-vars')/retype">
-                            <xf:label>Retype</xf:label>
+                            <xf:label>Retype CA password</xf:label>
                         </xf:secret>
                     </li>
                     <li>
-                        <xf:input ref="CA-email">
+                        <xf:input ref="email">
                             <xf:label>Email</xf:label>
                         </xf:input>
                     </li>
                     <li>
-                        <xf:input ref="expire">
-                            <xf:label>expires</xf:label>
-                        </xf:input>
+                        <xf:select1 ref="key-size" selection="closed">
+                            <xf:label>Keysize</xf:label>
+                            <xf:item>
+                                <xf:label>1024 bit</xf:label>
+                                <xf:value>1024</xf:value>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label>2048 bit</xf:label>
+                                <xf:value>2048</xf:value>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label>4096 bit</xf:label>
+                                <xf:value>4096</xf:value>
+                            </xf:item>
+                        </xf:select1>
+                    </li>
+                    <li>
+                        <xf:select1 ref="expire-days" selection="closed">
+                            <xf:label>Expires</xf:label>
+                            <xf:item>
+                                <xf:label>1 year</xf:label>
+                                <xf:value>365</xf:value>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label>2 years</xf:label>
+                                <xf:value>730</xf:value>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label>3 years</xf:label>
+                                <xf:value>1095</xf:value>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label>4 years</xf:label>
+                                <xf:value>1460</xf:value>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label>5 years</xf:label>
+                                <xf:value>1825</xf:value>
+                            </xf:item>
+                        </xf:select1>
                     </li>
                     <li>
                         <xf:trigger>
