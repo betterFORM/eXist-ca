@@ -18,7 +18,7 @@
     <expire-days>1825</expire-days>
     <pass/>
     <!-- list of fixed values for key-size 1024, 2048... -->
-    <key-size>2048</key-size>
+    <key-size>4096</key-size>
     <server-certs>
         <server-dns-name/>
     </server-certs>
