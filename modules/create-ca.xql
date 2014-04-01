@@ -3,7 +3,7 @@ import module namespace process="http://exist-db.org/xquery/process" at "java:or
 
 let $options :=
    <options>
-       <workingDir>/exist/apps/easyRSA</workingDir>    
+       <workingDir>/tmp</workingDir>    
    </options>
 
 let $config := <CA>
@@ -33,7 +33,8 @@ let $config := <CA>
     </defaults>
 </CA>
 
-return "export KEY_COUNTRY='" || data($config/country) || "'"
+process:execute(("sh", "/tmp/createca.sh"), $options)
+#return "export KEY_COUNTRY='" || data($config/country) || "'"
 
 (: 
     1. write vars file to working directory
