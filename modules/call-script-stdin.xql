@@ -9,5 +9,6 @@ let $options :=
             <line>Are you ready?</line>
         </stdin>
     </options>
-return
-    process:execute("cat", $options)
+
+let $foo := process:execute("cat", $options)
+return $foo
