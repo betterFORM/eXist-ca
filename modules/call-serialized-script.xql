@@ -8,22 +8,11 @@ let $tmpDir := util:system-property("java.io.tmpdir")
 (: serialize cert generation skript as binary :)
 let $script := util:binary-doc("/db/apps/eXistCA/ca-scripts/create-ca.sh")
 
-
 (:
-    Option 1:
     serialize binary doc to disk (java.io.tmpdir)
 :)
 let $tmp := file:serialize-binary($script, $tmpDir || "/create-ca.sh")
 return 
     process:execute(("sh", $tmpDir || "/create-ca.sh"), ()) 
     
-(:
-    Option 2:
-    execute script as string
-:)
-(:
-return
-    process:execute(("sh", "-c", util:binary-to-string($script)), ())
-:)
-
 

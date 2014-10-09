@@ -12,6 +12,4 @@ return
 (:
     evarything after the first 2 arguments is a sequence that will be the concatenated output for the commendline
 :)
-(:    process:execute(("sh", "create-ca.sh", "-param", $options//param, "-param2", $options//param2), $options):)
-(:system:get-exist-home():)
-system:get-module-load-path()
+  process:execute(("sh", "create-ca.sh", "-param", $options//param, "-param2", $options//param2), $options)
