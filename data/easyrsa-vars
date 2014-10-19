@@ -1,0 +1,12 @@
+# DEMO SAMPLE, this must be created from XForms via XSLT
+export CA_PASS="craps"
+export EASYRSA_KEY_SIZE=2048
+export EASYRSA_CA_EXPIRE=3650
+export EASYRSA_CERT_EXPIRE=1825
+export EASYRSA_REQ_CN="syscall CA"
+export EASYRSA_REQ_COUNTRY="DE"
+export EASYRSA_REQ_PROVINCE="Berlin"
+export EASYRSA_REQ_CITY="Berlin"
+export EASYRSA_REQ_ORG="syscall IT GmbH"
+export EASYRSA_REQ_OU=""
+export EASYRSA_REQ_EMAIL="ca@syscall.de"
