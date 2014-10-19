@@ -405,7 +405,7 @@ Your newly created PKI dir is: $EASYRSA_PKI
 
 # build-ca backend:
 build_ca() {
-	local opts= sub_ca=
+	local opts="-passout stdin " sub_ca=
 	while [ -n "$1" ]; do
 		case "$1" in
 			nopass) opts="$opts -nodes" ;;
