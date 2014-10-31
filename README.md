@@ -14,10 +14,11 @@ yourself is the only secure way today to establish real trusted computing.
 
 ## Requirements
 Users must be able to:
-a. create root certificate (create trust chain)
-b. create client certificates
-c. revoke certificate
-d. renew certificate
+
+* create root certificate (create trust chain)
+* create client certificates
+* revoke certificate
+* renew certificate
 
 ### Other 
 * The application is ideally delivered as a single package and must be easy to install on all operating systems.
