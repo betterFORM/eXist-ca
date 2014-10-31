@@ -9,13 +9,13 @@ been tempered in the past. As a result certificates issued by these authorities 
 and cannot be trusted any more for data or communication privacy.
 
 ## Solution
-Users of eXist will be able to setup a CA thereby becoming their own root certificate authority. Trusting
+Users of eXist will be able to setup a CA thereby becoming their own root certificate authority. This establishes a complete new chain of trust. Trusting
 yourself is the only secure way today to establish real trusted computing.
 
 ## Requirements
 Users must be able to:
-a. create root certificate
-b. create client certificate
+a. create root certificate (create trust chain)
+b. create client certificates
 c. revoke certificate
 d. renew certificate
 
