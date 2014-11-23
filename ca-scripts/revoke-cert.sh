@@ -1,47 +1,64 @@
 #!/bin/sh 
 
-# This script assumes $EASYRSA_VARS_FILE has been created correctly with 
-# parameters from XForms.  It does NOT create $EASYRSA_VARS_FILE itself.
+# revoke a certificate
+#
+# The following environment vars need to be passed from the caller:
+#   EXISTCA_CAPASS      (eg "craps")
+#   EXISTCA_CANAME      (eg "Example CA")
+#   EXISTCA_CERTNAME    (eg "John Doe", "existca.example.org")
 
+# sample data for cert revocation, to be passed from XQuery, hardcoded for now
+EXISTCA_CANAME="Example CA"
+EXISTCA_CAPASS="craps"
+EXISTCA_CERTNAME="John Doe"
 
-### ---- cruft, goes away later
-# just some info gathering (to understand paths, env etc)
-# this cruft goes away when I understand how to call the scripts correctly
-echo "pwd:"
-pwd
-echo "environment:"
-env
-echo "cmdline:"
-echo $*
-#echo "stdin:"
-#while read line; do echo $line; done
-
+#FAKE="echo"
 #DEBUG=1
-[ -n "$DEBUG" ] && FAKE="echo"
-### ---- end cruft
+if [ -n "$DEBUG" ]; then
+    echo -n "cmdline: "
+    echo $*
+    echo -n "pwd: "
+    pwd
+    echo "environment:"
+    env
+    echo "stdin:"
+    while read line; do echo $line; done
+fi
 
+
+# XXX validate all user provided input data!
 
 # need $BASEDIR to locate other dirs relative to this
 BASEDIR=`pwd`
 
 # source common script vars
-. $BASEDIR/ca-scripts/vars.sh
-
-# source other env vars created from XForms
-. $EASYRSA_VARS_FILE
-
-# strip whitespace (and maybe other) from Common Name, for use as file name
-ENTITY=`echo $EASYRSA_REQ_CN | tr -d ' '`
+. $BASEDIR/ca-scripts/script-vars.sh
 
 err=0
+
+# cleanup obscure chars out of passed CA name, for use as file name
+THIS_CA=`echo -n "$EXISTCA_CANAME" | tr -cd '[:alnum:]'`
+
+# strip whitespace (and maybe other) from Common Name, for use as file name
+THIS_CN=`echo -n "$EXISTCA_CERTNAME" | tr -cd '[:alnum:].-'`
+
+# pass to easyrsa/openssl as environment vars
+export EXISTCA_AUTHIN="env:EXISTCA_CAPASS"
+export EXISTCA_CAPASS
+
+# define EASYRSA_PKI to point to $THIS_CA directory
+export EASYRSA_PKI=${PKI_BASE}/${THIS_CA}
+
 cd $EASYRSA
 
 # revoke cert
-$FAKE echo "$CERT_PASS" | ./easyrsa revoke "$ENTITY"
+$FAKE ./easyrsa revoke "$THIS_CN"
 if [ $? -ne 0 ]; then
-    echo "ERROR creating $CERTTYPE certificate"
+    echo "ERROR revoking $CERTTYPE certificate"
     exit 1
 fi
+
+# generate new crl
 
 exit 0
 
