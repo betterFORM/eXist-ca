@@ -288,7 +288,8 @@ EASYRSA_PKI env-var undefined"
 	# Verify EASYRSA_OPENSSL command gives expected output
 	if [ -z "$EASYRSA_SSL_OK" ]; then
 		local val="$("$EASYRSA_OPENSSL" version)"
-		[ "${val%% *}" = "OpenSSL" ] || die "\
+#		[ "${val%% *}" = "OpenSSL" ] || die "\
+		[ "${val%% *}" = "OpenSSL" -o "${val%% *}" = "LibreSSL" ] || die "\
 Missing or invalid OpenSSL
 Expected to find openssl command at: $EASYRSA_OPENSSL"
 	fi
@@ -405,10 +406,11 @@ Your newly created PKI dir is: $EASYRSA_PKI
 
 # build-ca backend:
 build_ca() {
-	local opts="-passout stdin " sub_ca=
+#	local opts= sub_ca=
+	local opts="-passout $EXISTCA_AUTHOUT" sub_ca=
 	while [ -n "$1" ]; do
 		case "$1" in
-			nopass) opts="$opts -nodes" ;;
+			nopass) opts="-nodes" ;;
 			subca) sub_ca=1 ;;
 			*) warn "Ignoring unknown command option: '$1'" ;;
 		esac
@@ -497,10 +499,11 @@ Run easyrsa without commands for usage and commands."
 	shift
 
 	# function opts support
-	local opts=
+#	local opts=
+	local opts="-passout $EXISTCA_AUTHOUT"
 	while [ -n "$1" ]; do
 		case "$1" in
-			nopass) opts="$opts -nodes" ;;
+			nopass) opts="-nodes" ;;
 			# batch flag supports internal callers needing silent operation
 			batch) local EASYRSA_BATCH=1 ;;
 			*) warn "Ignoring unknown command option: '$1'" ;;
@@ -555,7 +558,8 @@ key: $key_out
 
 # common signing backend
 sign_req() {
-	local crt_type="$1" opts=
+#	local crt_type="$1" opts=
+	local crt_type="$1" opts="-passin $EXISTCA_AUTHIN"
 	local req_in="$EASYRSA_PKI/reqs/$2.req"
 	local crt_out="$EASYRSA_PKI/issued/$2.crt"
 
@@ -705,7 +709,9 @@ $(display_dn x509 "$crt_in")
 Unable to revoke as no certificate was found. Certificate was expected
 at: $crt_in"
 
-	"$EASYRSA_OPENSSL" ca -revoke "$crt_in" -config "$EASYRSA_SSL_CONF" || die "\
+#	"$EASYRSA_OPENSSL" ca -revoke "$crt_in" -config "$EASYRSA_SSL_CONF" || die "\
+	local passopt="-passin $EXISTCA_AUTHIN"
+	"$EASYRSA_OPENSSL" ca $passopt -revoke "$crt_in" -config "$EASYRSA_SSL_CONF" || die "\
 Failed to revoke certificate: revocation command failed."
 
 	notice "\
@@ -821,6 +827,7 @@ Missing key expected at: $key_in"
 		fi
 
 		# export the p12:
+		pkcs_opts="$pkcs_opts -password $EXISTCA_AUTHPASS"
 		"$EASYRSA_OPENSSL" pkcs12 -in "$crt_in" -inkey "$key_in" -export \
 			-out "$pkcs_out" $pkcs_opts || die "\
 Export of p12 failed: see above for related openssl errors."
