@@ -6,6 +6,7 @@
 #   EXISTCA_CANAME      (eg "Example CA")
 #   EXISTCA_CERTNAME    (eg "John Doe", "existca.example.org")
 #   EXISTCA_CERTPASS    (eg "test")
+#   EXISTCA_CERTTYPE    (eg "client", "server")
 #   EXISTCA_CERTKEYSIZE (eg 2048)
 
 # sample data for cert request, to be passed from XQuery, hardcoded for now
@@ -13,10 +14,12 @@ EXISTCA_CANAME="Example CA"
 ## client (user) cert
 EXISTCA_CERTNAME="John Doe"
 EXISTCA_CERTPASS="test"
+EXISTCA_CERTTYPE="client"
 EXISTCA_CERTKEYSIZE=2048
 ## server cert
 #EXISTCA_CERTNAME="www.example.org"
 #EXISTCA_CERTPASS=""
+#EXISTCA_CERTTYPE="server"
 #EXISTCA_CERTKEYSIZE=2048
 
 #FAKE="echo"
