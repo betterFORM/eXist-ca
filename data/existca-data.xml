@@ -1,0 +1,49 @@
+<!--
+
+Sample data
+
+-->
+
+<existca>
+  <!-- system config data if running on an appliance, eg network config -->
+  <appliance/>
+
+  <!-- container for all CAs -->
+  <CAs>
+
+    <CA name="Example CA" keysize="4096" expire="3650"
+	servername="existca.example.org">
+
+        <!-- metadata -->
+
+        <capass>craps</capass>
+
+	<!-- these are just textual representations for display-ca -->
+	<expiry-date/>
+	<ca-cert-txt/>
+
+	<!-- obsolete metadata, may be used in Expert Mode -->
+        <country>DE</country>
+        <province/>
+        <city/>
+        <org/>
+        <org-unit/>
+        <email/>
+
+	<!-- operational data samples, two existing certs -->
+	<certs>
+	  <cert name="existca.example.org" type="server" serial="01"/>
+	  <cert name="John Doe" type="client" serial="02"/>
+	</certs>
+
+	<!-- one pending, one rejected cert request -->
+	<pending-requests>
+	  <req name="www.example.org" type="server"/>
+	</pending-requests>
+	<rejected-requests>
+	  <req name="NSA buddy" type="client" rej-reason="no buddy"/>
+	</rejected-requests>
+
+    </CA>
+  </CAs>
+</existca>
