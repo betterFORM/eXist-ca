@@ -59,6 +59,11 @@ if [ $? -ne 0 ]; then
 fi
 
 # generate new crl
+$FAKE ./easyrsa gen-crl
+if [ $? -ne 0 ]; then
+    echo "ERROR creating certificate revocation list"
+    exit 1
+fi
 
 exit 0
 
