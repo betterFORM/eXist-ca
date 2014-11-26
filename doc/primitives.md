@@ -61,7 +61,7 @@ don't worry much, choose 4096 bit if you do. For servers, 1024 bit may be
 useful to allow faster responses on crypto protected services.
 
 Using RSA keys >8192 bit does not make much sense because your services 
-may timeout before crypto operations finished.
+may timeout before crypto operations finish.
 Using RSA keys <1024 bit is not recommended. This may be broken by an 
 attacker with sufficient resources.
 
@@ -69,7 +69,59 @@ A better way to address the Keysize/Proctime issue is to use elliptic
 curve crypto (as in eXistCA "Expert Mode"). Not all crypto peers do 
 understand that yet.
 
-# Usage Primitives
+# Basic Operations (user view)
+
+## Admin creates a CA
+
+Obviously a CA has to be created before any operations can be done on it, 
+so this is usually the initial start page.  User enters some CA parameters, 
+on submit the create-ca.sh wrapper script gets executed, on success the 
+CA is displayed in the next form.
+
+If this is the first CA that was created, an SSL server cert is generated 
+and installed into eXist/Jetty, so eXistCA can be accessed with HTTPS 
+using its own trusted certificate.
+
+This page will also be used when the admin chooses to create an additional 
+CA, without the Jetty/SSL automatism.
+
+## Admin displays a CA
+
+This page is the main working space for the CA admin.  It first displays 
+some CA meta information (readonly, not editable) like "CA Name", "CA 
+Expire Date" as human readable string.
+
+It then displays a list of pending certificate requests waiting to be signed. 
+A request can be selected from this list, and a button "sign request" allows 
+the CA admin to sign and create the selected cert.  The CA password must be 
+entered for this.
+
+Next it displays a list of all issued certificates.  Filters would be 
+useful to see only valid/expired/revoked certs.  Valid and expired certs 
+may be selected from this list, and two buttons "renew cert" and "revoke 
+cert" allow the CA admin to renew or revoke the selected cert.  The CA 
+password must be entered for this.
+
+At the bottom are buttons for special CA functions:
+- generate a CRL (list of revoked certs for clients to download)
+- renew the CA itself (if approacjing expiry date)
+
+## User requests a cert
+
+This page can be in a different URI space than all other pages, because 
+this form should be filled out by a user requesting a cert, rather than the 
+admin operating the CA.
+
+The main purpose for this is that the user can type in his private cert 
+pass phrase, and the CA admin does not need to know this pass phrase to 
+create the cert.
+
+User enters a few parameters including his pass phrase, on submit a cert 
+request is generated, waiting to be signed by the CA admin.
+
+The user may later pick up his cert from this page as well.
+
+# Usage Primitives (technical view)
 
 ## About selecting the start page
 
@@ -106,7 +158,7 @@ cert for the eXist Jetty, and a few system level operations.
 
 Input Fields: there are 2 groups of fields, one for data pertaining to the 
 CA itself and another for data pertaining to the web server cert to be 
-installed into eXist/Jetty.  These should probably a third group (or sub 
+installed into eXist/Jetty.  These should probably be a third group (or sub 
 page) to network settings for the CA appliance. not covered yet.
 
 First group: data for CA creation
@@ -145,18 +197,7 @@ Second group: data for eXistCA web server cert
 -- default value: "existca.example.org"
 -- env var passed to wrapper scripts: EXISTCA_SRVNAME
 
-- "Server Cert Key Size"
--- UI type: select, values (1024, 2048, 4096, 8192)
--- data type: integer
--- default value: 2048
--- env var passed to wrapper scripts:  EXISTCA_SRVKEYSIZE
-
-- "Server Cert Validity"
--- UI type: select, values ("1 year":365, "3 years":1095, "5yrs":1825, "10yrs":3650)
--- data type: integer
--- default value: "5 years":1825
--- env var passed to wrapper scripts: EXISTCA_SRVEXPIRE
--- not even needed, use same validity as for CA
+["Server Cert Key Size" and "Server Cert Validity" removed, use CA defaults]
 
 ## display-ca
 
@@ -187,13 +228,21 @@ Choosing a CA should call display-ca for that CA.
 
 Purpose: allow unprivileged users to request a cert without needing to know 
 the CA password.  If successful, the request is put into the queue of 
-pending cert waiting to be signed by a CA admin.
+pending certs waiting to be signed by a CA admin.
+
+- Hidden parameter: selected-CA
 
 - "Certificate Name" (user name or server DNS name)
 -- UI type: textfield
 -- data type: string
 -- default value: [none]
 -- env var passed to wrapper scripts: EXISTCA_CERTNAME
+
+- "Certificate Type"
+-- UI type: select, values ("client", "server")
+-- data type: string
+-- default value: "client"
+-- env var passed to wrapper scripts:  EXISTCA_CERTTYPE
 
 - "Certificate Password"
 -- UI type: textfield, password
@@ -212,13 +261,74 @@ pending cert waiting to be signed by a CA admin.
 
 Purpose: allow a CA admin to sign a pending cert. 
 
+- Hidden parameter: selected-CA
+- Hidden parameter: selected-request-name
+- Hidden parameter: selected-request-type
+
+- "Cert Validity"
+-- UI type: select, values ("1 year":365, "3 years":1095, "5yrs":1825, "10yrs":3650)
+-- data type: integer
+-- default value: "5 years":1825
+-- env var passed to wrapper scripts: EXISTCA_CERTEXPIRE
+-- remarks: could be a combo box (choose value or type a number)
+
+- "CA Password"
+-- UI type: textfield, password
+-- data type: string
+-- default value: [none]
+-- env var passed to wrapper scripts:  EXISTCA_CAPASS
+
 ## revoke-cert
 
 Purpose: revoke a previously issued cert.
 
+- Hidden parameter: selected-CA
+- Hidden parameter: selected-cert
+
+- "CA Password"
+-- UI type: textfield, password
+-- data type: string
+-- default value: [none]
+-- env var passed to wrapper scripts:  EXISTCA_CAPASS
+
 ## renew-cert
 
 Purpose: renew a previously issued cert.
+
+- Hidden parameter: selected-CA
+- Hidden parameter: selected-request-name
+- Hidden parameter: selected-request-type
+
+- "Cert Validity"
+-- UI type: select, values ("1 year":365, "3 years":1095, "5yrs":1825, "10yrs":3650)
+-- data type: integer
+-- default value: "5 years":1825
+-- env var passed to wrapper scripts: EXISTCA_CERTEXPIRE
+-- remarks: could be a combo box (choose value or type a number)
+
+- "CA Password"
+-- UI type: textfield, password
+-- data type: string
+-- default value: [none]
+-- env var passed to wrapper scripts:  EXISTCA_CAPASS
+
+## gen-crl
+
+Purpose: generate a current certificate revocation list (CRL)
+
+- Hidden parameter: selected-CA
+
+- "CA Password"
+-- UI type: textfield, password
+-- data type: string
+-- default value: [none]
+-- env var passed to wrapper scripts:  EXISTCA_CAPASS
+
+## renew-ca
+
+Purpose: renew the CA.
+
+- Hidden parameter: selected-CA
 
 [not implemented yet]
 
