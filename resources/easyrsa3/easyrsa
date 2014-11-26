@@ -728,7 +728,9 @@ gen_crl() {
 	verify_ca_init
 
 	local out_file="$EASYRSA_PKI/crl.pem"
-	"$EASYRSA_OPENSSL" ca -gencrl -out "$out_file" -config "$EASYRSA_SSL_CONF" || die "\
+        local passopt="-passin $EXISTCA_AUTHIN"
+#	"$EASYRSA_OPENSSL" ca -gencrl -out "$out_file" -config "$EASYRSA_SSL_CONF" || die "\
+	"$EASYRSA_OPENSSL" ca $passopt -out "$out_file" -config "$EASYRSA_SSL_CONF" || die "\
 CRL Generation failed.
 "
 
