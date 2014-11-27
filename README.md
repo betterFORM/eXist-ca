@@ -1,5 +1,8 @@
 # eXist CA
 
+## What is it?
+exist CA allows to setup a complete trustchain and to manage your own private certificate authority (CA).
+
 Anybody having access to this file is invited to contribute content!
 
 ## Motivation
