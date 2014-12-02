@@ -1,49 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
 Sample data
 
 -->
-
 <existca>
   <!-- system config data if running on an appliance, eg network config -->
-  <appliance/>
+    <appliance/>
 
   <!-- container for all CAs -->
-  <CAs>
+    <CAs>
+        <CA name="" keysize="" expire="" servername="">
+            <capass/>
+            <expiry-date/>
+            <ca-cert-txt/>
+            <country/>
+            <province/>
+            <city/>
+            <org/>
+            <org-unit/>
+            <email/>
+            <certs>
+                <cert name="" type="" serial=""/>
+            </certs>
+            <pending-requests>
+                <req name="" type=""/>
+            </pending-requests>
+            <rejected-requests>
+                <req name="" type="" rej-reason=""/>
+            </rejected-requests>
+        </CA>
+<!--        
+        <CA name="" keysize="" expire="" servername="">
 
-    <CA name="Example CA" keysize="4096" expire="3650"
-	servername="existca.example.org">
+    metadata
+            <capass>craps</capass>
 
-        <!-- metadata -->
+	these are just textual representations for display-ca
+            <expiry-date/>
+            <ca-cert-txt/>
 
-        <capass>craps</capass>
+	obsolete metadata, may be used in Expert Mode
+            <country>DE</country>
+            <province/>
+            <city/>
+            <org/>
+            <org-unit/>
+            <email/>
 
-	<!-- these are just textual representations for display-ca -->
-	<expiry-date/>
-	<ca-cert-txt/>
+	operational data samples, two existing certs 
+            <certs>
+                <cert name="existca.example.org" type="server" serial="01"/>
+                <cert name="John Doe" type="client" serial="02"/>
+            </certs>
 
-	<!-- obsolete metadata, may be used in Expert Mode -->
-        <country>DE</country>
-        <province/>
-        <city/>
-        <org/>
-        <org-unit/>
-        <email/>
-
-	<!-- operational data samples, two existing certs -->
-	<certs>
-	  <cert name="existca.example.org" type="server" serial="01"/>
-	  <cert name="John Doe" type="client" serial="02"/>
-	</certs>
-
-	<!-- one pending, one rejected cert request -->
-	<pending-requests>
-	  <req name="www.example.org" type="server"/>
-	</pending-requests>
-	<rejected-requests>
-	  <req name="NSA buddy" type="client" rej-reason="no buddy"/>
-	</rejected-requests>
-
-    </CA>
-  </CAs>
+	one pending, one rejected cert request
+            <pending-requests>
+                <req name="www.example.org" type="server"/>
+            </pending-requests>
+            <rejected-requests>
+                <req name="NSA buddy" type="client" rej-reason="no buddy"/>
+            </rejected-requests>
+        </CA>
+-->
+    </CAs>
 </existca>
