@@ -1,22 +1,13 @@
 #!/bin/sh
 
-PKI_BASE=/tmp/pki
 
+export EXISTCA_EXPORTPASS=export
 
 ### Common enviroment variables that get passed to easyrsa
 
 # basedir for the EasyRSA software.  needed to call easyrsa scripts
-export EASYRSA=$BASEDIR/resources/easyrsa3
-
-# $EASYRSA_PKI is the heart of the CA, this directory contains all 
-# infrastructure files and generated keys and certs.  These are PERSISTENT 
-# data that must be kept over the lifetime of the CA.  This is also extremely 
-# CRITICAL data, loss of this data will destroy the CA and defunct all 
-# services using it.
-#
-# For now this ia subdir below $EASYRSA/ (EasyRSA default setting)
-# This should be pseudo filesystem mapped into eXist DB later.
-#export EASYRSA_PKI=$BASEDIR/pki
+export EASYRSA=$EXISTCA_HOME/resources/easyrsa3
+#export EASYRSA=$EXISTCA_HOME/easyrsa3
 
 # set batch mode
 export EASYRSA_BATCH=yes
@@ -34,5 +25,19 @@ export EASYRSA_NS_COMMENT=
 #export EASYRSA_NO_VARS
 
 # OpenSSL config file, defaults are usually fine
-#export EASYRSA_SSL_CONF=$BASEDIR/data/openssl.cnf
+#export EASYRSA_SSL_CONF=$EXISTCA_HOME/data/openssl.cnf
 
+
+checkenv () {
+    TMPENV=`mktemp` || exit 1
+    enverr=0
+    env >$TMPENV
+    for e in $*; do
+	if ! grep -q "$e" $TMPENV; then
+	    echo "required env var \"$e\" is undefined"
+	    enverr=1
+	fi
+    done
+    rm -f $TMPENV
+    return $enverr
+}
