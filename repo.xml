@@ -10,5 +10,5 @@
     <type>application</type>
     <target>eXistCA</target>
     <prepare>pre-install.xql</prepare>
-    <finish/>
+    <finish>post-install.xql</finish>
 </meta>

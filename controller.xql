@@ -11,7 +11,7 @@ return
 if($exist:path eq "") then
     (
     <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
-        <redirect url="/exist/apps/eXistCA/index.html"/>
+        <redirect url="/exist/apps/eXistCA/index.xhtml"/>
     </dispatch>        
     )
 else if ($exist:path eq "/") then
