@@ -1,5 +1,5 @@
 html {
-  background: url(/exist/apps/eXistCA/resources/css/../../resources/images/privacykey.jpg) no-repeat center center fixed;
+  background: url(../../resources/images/privacykey.jpg) no-repeat center center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -14,6 +14,53 @@ body {
   width: 100%;
   height: 100%;
   overflow: auto;
+  background: transparent;
+}
+header {
+  width: 100%;
+  background: whitesmoke;
+  border-bottom: 1px solid #333;
+  opacity: 0.6;
+  position: fixed;
+  top: 0;
+}
+header .btn {
+  font-size: 16px;
+  margin: 4px;
+  display: inline-block;
+}
+header #ca-config {
+  float: right;
+}
+form {
+  width: 100%;
+  display: block;
+}
+.form-control {
+  margin-bottom: 10px;
+}
+input.form-control {
+  width: 100%;
+}
+.widgetContainer {
+  display: block;
+}
+.xfInvalid .xfLabel {
+  color: white !important;
+}
+.xfRequired > .xfLabel:after {
+  color: white;
+}
+.btn-group {
+  text-align: center;
+  width: 100%;
+  margin-top: 10px;
+}
+.app-name {
+  text-align: center;
+  font-size: 48px;
+  color: steelblue;
+  margin-top: 64px;
 }
 menu {
   text-align: center;
@@ -21,45 +68,87 @@ menu {
   padding: 10px 0;
   whitespace: nowrap;
 }
-button {
-  padding: 10px;
-  font-size: 1.2em;
-  margin: 0;
-  border: 1px solid #666666;
-  border-collapse: collapse;
-  cursor: pointer;
-}
-button.selected-button {
-  background: #ccc;
-}
-#config,
-#create {
-  border-bottom-left-radius: 20px;
-  border-top-left-radius: 20px;
-  border-right: none;
-}
-#certs,
-#revoke {
-  border-top-right-radius: 20px;
-  border-bottom-right-radius: 20px;
-}
-#revoke {
-  border-left: none;
+.xfCase {
+  max-width: 400px;
+  margin: 0 auto;
+  background: steelblue;
+  border: 1px solid whitesmoke;
+  padding: 20px;
 }
 ul {
-  list-type: none;
+  list-style: none;
+  padding: 0;
+}
+h3 {
+  color: whitesmoke;
+  margin-top: 10px;
+}
+.hint {
+  margin-top: 0;
+}
+#home .cert-list {
+  opacity: 0.7;
+  background: steelblue;
+  color: whitesmoke;
+  padding: 20px;
+}
+#home .cert-list thead td {
+  font-weight: 700;
+  color: white;
+}
+#home .cert-list tr:hover {
+  color: #333;
+}
+#home .cert-list thead tr:hover {
+  color: whitesmoke;
+}
+#home .cert-list td {
+  vertical-align: middle;
+}
+#home .cert-list .fa-lock.active {
+  color: darkgreen;
+}
+#home .cert-list .fa {
+  min-height: 43px;
+  display: inline-block;
+}
+#home .cert-list .fa-unlock.pending {
+  color: orange;
+}
+#home .cert-list .fa-lock.expired {
+  color: darkred;
+}
+#home .cert-list td:nth-child(3) {
+  text-align: center;
+  font-size: 16px;
+}
+#home ul {
+  text-align: center;
+}
+#home li {
+  width: 100%;
+}
+#home .xfTrigger {
+  display: inline-block;
+  width: 100%;
+}
+#home button {
+  width: 280px;
+  padding: 10px;
+  position: relative;
+}
+#home button .fa {
+  font-size: 16px;
+  position: absolute;
+  right: 10px;
+  top: 13px;
 }
 .bf-panel {
-  background: none repeat scroll 0 0 white;
-  border: thin solid white;
-  border-radius: 15px;
+  background: transparent;
   display: block;
   margin: 0 auto;
-  min-height: 300px;
-  min-width: 320px;
-  width: 40%;
-  opacity: 0.75;
-  padding: 0 20px;
+  padding: 20px;
+  color: whitesmoke;
 }
 .bf-panel form {
   display: inline-block;
@@ -71,10 +160,11 @@ ul {
   margin: 0;
   width: 100%;
 }
-.bf-panel form li {
-  float: left;
+.bf-panel li {
   margin: 10px 0;
-  text-align: center;
+}
+.bf-panel .xfLabel {
+  font-weight: 300;
 }
 .bf-panel .form-label {
   font-size: 1.25em;
@@ -91,9 +181,7 @@ ul {
   float: left;
 }
 .bf-panel input {
-  width: 100%;
   float: left;
-  padding: 2px;
 }
 .bf-panel input:required {
   font-weight: bold;
@@ -102,12 +190,17 @@ ul {
   border-bottom-left-radius: 10px;
   border-top-right-radius: 10px;
 }
-body.xforms {
-  background-image: none;
+#config,
+#create {
+  border-bottom-left-radius: 20px;
+  border-top-left-radius: 20px;
+  border-right: none;
 }
-body.xforms li {
-  text-align: left;
+#certs,
+#revoke {
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
 }
-body.xforms li .widgetContainer {
-  width: 60%;
+#revoke {
+  border-left: none;
 }
