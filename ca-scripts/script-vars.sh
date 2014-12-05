@@ -6,7 +6,7 @@ export EXISTCA_EXPORTPASS=export
 ### Common enviroment variables that get passed to easyrsa
 
 # basedir for the EasyRSA software.  needed to call easyrsa scripts
-export EASYRSA=$EXISTCA_HOME/resources/easyrsa3
+export EASYRSA=$EXISTCA_HOME/../resources/easyrsa3
 #export EASYRSA=$EXISTCA_HOME/easyrsa3
 
 # set batch mode
@@ -22,7 +22,7 @@ export EASYRSA_REQ_EMAIL=
 export EASYRSA_NS_COMMENT=
 
 # do not parse any kind of easyrsa vars file
-#export EASYRSA_NO_VARS
+export EASYRSA_NO_VARS
 
 # OpenSSL config file, defaults are usually fine
 #export EASYRSA_SSL_CONF=$EXISTCA_HOME/data/openssl.cnf
@@ -41,3 +41,15 @@ checkenv () {
     rm -f $TMPENV
     return $enverr
 }
+
+logmsg () {
+    echo $*
+    [ -x /usr/bin/logger ] && logger -t eXistCA "$*"
+}
+
+err_out () {
+    $errcode=$1
+    echo exiting with error code $errcode
+    exit $ercode
+}
+

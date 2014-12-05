@@ -52,7 +52,8 @@ fi
 
 # env sanity checks
 if ! checkenv $REQ_ENV; then
-    echo "ERROR - refuse to work on incomplete data"
+    logmsg "ERROR - refuse to work on incomplete data"
+    #err_out 1
     exit 1
 fi
 
@@ -62,6 +63,9 @@ err=0
 
 # cleanup obscure chars out of passed CA name, for use as file name
 THIS_CA=`echo -n "$EXISTCA_CANAME" | tr -cd '[:alnum:]'`
+
+# cleanup obscure chars out of passed server name, for use as file name
+THIS_SRV=`echo -n "$EXISTCA_SRVNAME" | tr -cd '[:alnum:].-'`
 
 # define EASYRSA_PKI to point to $THIS_CA directory
 export EASYRSA_PKI=${PKI_BASE}/${THIS_CA}
@@ -84,18 +88,20 @@ export EXISTCA_CAPASS EXISTCA_SRVPASS
 
 cd $EASYRSA
 
-# initialize this CA
+# initialize CA infrastructure
 $FAKE ./easyrsa init-pki
 if [ $? -ne 0 ]; then
-    echo "ERROR [$THIS_CA] - failed to initialize PKI directories"
-    err=1
+    logmsg "ERROR [$THIS_CA] - failed to initialize PKI directories"
+    #err=1
+    #err_out 2
+    exit 2
 fi
 
 # copy pregenerated DH parameters (generating them may take a long time)
 # not required for the CA, may be useful for applications
 $FAKE cp $EXISTCA_HOME/dh-samples/dh*.pem $EASYRSA_PKI/
 if [ $? -ne 0 ]; then
-    echo "ERROR [$THIS_CA] - failed to copy DH parameters"
+    logmsg "ERROR [$THIS_CA] - failed to copy DH parameters"
     err=1
 fi
 
@@ -104,8 +110,10 @@ EXISTCA_AUTHIN=
 EXISTCA_AUTHOUT="env:EXISTCA_CAPASS"
 $FAKE ./easyrsa build-ca
 if [ $? -ne 0 ]; then
-    echo "ERROR [$THIS_CA] - failed to create CA cert"
-    err=1
+    logmsg "ERROR [$THIS_CA] - failed to create CA cert"
+    #err=1
+    #err_out 3
+    exit 3
 fi
 
 ### create server cert for eXist webserver
@@ -113,7 +121,7 @@ fi
 # server cert data
 export EASYRSA_KEY_SIZE=$EXISTCA_SRVKEYSIZE
 export EASYRSA_CERT_EXPIRE=$EXISTCA_SRVEXPIRE
-export EASYRSA_REQ_CN=$EXISTCA_SRVNAME
+export EASYRSA_REQ_CN=$THIS_SRV
 
 # create web server cert request
 if [ -n "$EXISTCA_SRVPASS" ]; then
@@ -125,7 +133,7 @@ fi
 EXISTCA_AUTHIN=
 $FAKE ./easyrsa gen-req "$EASYRSA_REQ_CN" $genreq_opt
 if [ $? -ne 0 ]; then
-    echo "ERROR [$THIS_CA] - failed to generate web server certificate request"
+    logmsg "ERROR [$THIS_CA] - failed to generate web server certificate request"
     err=1
 fi
 
@@ -134,7 +142,7 @@ EXISTCA_AUTHIN="env:EXISTCA_CAPASS"
 EXISTCA_AUTHOUT=
 $FAKE ./easyrsa sign-req server "$EASYRSA_REQ_CN"
 if [ $? -ne 0 ]; then
-    echo "ERROR [$THIS_CA] - failed to sign web server certificate"
+    logmsg "ERROR [$THIS_CA] - failed to sign web server certificate"
     err=1
 fi
 
@@ -148,42 +156,59 @@ else
 fi
 $FAKE ./easyrsa export-p12 "$EASYRSA_REQ_CN"
 if [ $? -ne 0 ]; then
-    echo "ERROR [$THIS_CA] - failed to pkcs12 export web server certificate"
+    logmsg "ERROR [$THIS_CA] - failed to pkcs12 export web server certificate"
     err=1
 fi
 
 # install generated web server cert into eXist config and reload eXist
 export SERVER_P12=${PKI_BASE}/${THIS_CA}/private/${EXISTCA_SRVNAME}.p12
-export EXISTCA_HOME
+export CA_CERT=${PKI_BASE}/${THIS_CA}/ca.crt
+export EXISTCA_HOME THIS_CA
 
 $FAKE sh $EXISTCA_HOME/reconfig-jetty.sh
 if [ $? -ne 0 ]; then
-    echo "ERROR [$THIS_CA] - failed to reconfig jetty"
+    logmsg "ERROR [$THIS_CA] - failed to reconfig jetty"
     err=1
 fi
 
 # check/fix hostname/network config to match web server name
 
 
-# return some XML data fragment
-#<CA name="" servername="">
-#  <capass><capass>
-#  <cacert></cacert>
-#  <cakey></cakey>
-#  <current-serial></current-serial>
-#  <certs>
-#    <cert name="" type="" serial="" status="">
-#      <certpass></certpass>
-#      <cert></cert>
-#      <key></key>
-#      <pkcs12></pkcs12>
-#      <req></req>
-#    </cert>
-#  </certs>
-#</CA>
+# dump XML data to stdout
+ca_crt=`cat $EASYRSA_PKI/ca.crt`
+ca_key=`cat $EASYRSA_PKI/private/ca.key`
+srv_crt=`cat $EASYRSA_PKI/issued/${THIS_SRV}.crt`
+srv_key=`cat $EASYRSA_PKI/private/${THIS_SRV}.key`
+#srv_pkcs12=`cat $EASYRSA_PKI/private/${THIS_SRV}.p12`
+srv_req=`cat $EASYRSA_PKI/reqs/${THIS_SRV}.req`
+ca_serial=`tr -dc '[:xdigit:]' <$EASYRSA_PKI/serial`
+#read status expire serial unkn cn
+ 
+printf "
+<CA name=\"$THIS_CA\" nicename=\"$EXISTCA_CANAME\" servername=\"$THIS_SRV\">
+  <keysize>$EXISTCA_CAKEYSIZE</keysize>
+  <expire>$EXISTCA_CAEXPIRE</expire>
+  <capass>$EXISTCA_CAPASS<capass>
+  <cacert>$ca_crt</cacert>
+  <cakey>$ca_key</cakey>
+  <current-serial>$ca_serial</current-serial>
+  <certs>
+    <cert name=\"$THIS_SRV\" nicename=\"$EXISTCA_SRVNAME\">
+      <certtype>server</certtype>
+      <serial></serial>
+      <status></status>
+      <certpass>$EXISTCA_SRVPASS</certpass>
+      <cert>$srv_crt</cert>
+      <key>$srv_key</key>
+      <pkcs12>$srv_pkcs12</pkcs12>
+      <req>$srv_req</req>
+    </cert>
+  </certs>
+</CA>
+"
 
 if [ $err -ne 0 ]; then
-    echo "ERROR creating CA [$THIS_CA]"
+    logmsg "ERROR creating CA [$THIS_CA]"
     exit 1
 else
     exit 0
