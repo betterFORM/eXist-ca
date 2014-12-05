@@ -1,8 +1,10 @@
 #!/bin/sh
-set -x
+
 # required env vars as documented above
 export REQ_ENV="\
  SERVER_P12 \
+ CA_CERT \
+ THIS_CA \
  JAVA_HOME \
  JETTY_HOME \
  EXISTCA_SRVPASS \
@@ -45,6 +47,8 @@ USE_PW=$DEFPW
 # import PKCS12 into keystore
 #$FAKE $JAVA_HOME/bin/keytool -importkeystore -srckeystore $SERVER_P12 -srcstoretype PKCS12 -destkeystore $JETTY_KEYSTORE -srcalias 1 -destalias jetty -deststorepass "$USE_PW" -srcstorepass "$EXISTCA_EXPORTPASS"
 $FAKE $JAVA_HOME/bin/keytool -importkeystore -srckeystore $SERVER_P12 -srcstoretype PKCS12 -destkeystore $JETTY_KEYSTORE -srcalias 1 -destalias jetty -deststorepass "$USE_PW" -srcstorepass "$EXISTCA_SRVPASS"
+# also import CA cert explicitly, avoids complaints from jetty
+$FAKE $JAVA_HOME/bin/keytool -import -alias $THIS_CA -file $CA_CERT -keystore $JETTY_KEYSTORE -storepass "$USE_PW" -noprompt
 
 # rewrite jetty.xml file
 cd ${JETTY_HOME}/etc && cp jetty.xml jetty.xml.bak \
