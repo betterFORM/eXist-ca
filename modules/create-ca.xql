@@ -20,12 +20,12 @@ let $options :=
        <workingDir>$ca-scripts</workingDir>
        <environment>
            <env name="EXISTCA_CANAME" value="{$config/@name}"/>
-           <env name="EXISTCA_CAKEYSIZE" value="{$config/@keysize}"/>
-           <env name="EXISTCA_CAEXPIRE" value="{$config/@expire}"/>
+           <env name="EXISTCA_CAKEYSIZE" value="{$config/keysize}"/>
+           <env name="EXISTCA_CAEXPIRE" value="{$config/expire}"/>
            <env name="EXISTCA_CAPASS" value="{$config/capass}"/>
            <env name="EXISTCA_SRVNAME" value="{$config/@servername}"/>
-           <env name="EXISTCA_SRVKEYSIZE" value="{$config/@keysize}"/>
-           <env name="EXISTCA_SRVEXPIRE" value="{$config/@expire}"/>
+           <env name="EXISTCA_SRVKEYSIZE" value="{$config/keysize}"/>
+           <env name="EXISTCA_SRVEXPIRE" value="{$config/expire}"/>
        </environment>
        <!-- myopt>myopt</myopt -->
    </options>

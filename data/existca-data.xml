@@ -10,7 +10,9 @@ Sample data
 
   <!-- container for all CAs -->
     <CAs>
-        <CA name="" keysize="" expire="" servername="">
+        <CA name="" nicename="" servername="">
+	    <keysize/>
+	    <expire/>
             <capass/>
             <expiry-date/>
             <ca-cert-txt/>
@@ -20,9 +22,21 @@ Sample data
             <org/>
             <org-unit/>
             <email/>
+            <cacert/>
+            <cakey/>
             <certs>
-                <cert name="" type="" serial=""/>
-            </certs>
+                <cert name="" nicename="">
+		  <certtype/>
+		  <status/>
+		  <expire-timestamp/>
+		  <serial/>
+		  <certpass/>
+		  <cert/>
+		  <key/>
+		  <pkcs12/>
+		  <req/>
+		</cert>
+             </certs>
             <pending-requests>
                 <req name="" type=""/>
             </pending-requests>
@@ -31,9 +45,13 @@ Sample data
             </rejected-requests>
         </CA>
 <!--        
-        <CA name="" keysize="" expire="" servername="">
+        nicename is the CA name as entered by user, possibly with spaces
+	name is nicename without all special chars, for use as file name
+        <CA name="" nicename="" servername="">
 
-    metadata
+        CA metadata
+	    <keysize/>
+	    <expire/>
             <capass>craps</capass>
 
 	these are just textual representations for display-ca
@@ -48,10 +66,34 @@ Sample data
             <org-unit/>
             <email/>
 
+        generated CA cert and key in ascii representation
+            <cacert/>
+            <cakey/>
+
 	operational data samples, two existing certs 
             <certs>
-                <cert name="existca.example.org" type="server" serial="01"/>
-                <cert name="John Doe" type="client" serial="02"/>
+                <cert name="existca.example.org" nicename="existca.example.org">
+		  <certtype>server</certtype>
+		  <status>V</status>
+		  <expire-timestamp>191204173627Z</expire-timestamp>
+		  <serial>01</serial>
+		  <certpass/>
+		  <cert/>
+		  <key/>
+		  <pkcs12/>
+		  <req/>
+		</cert>
+                <cert name="JohnDoe" nicename="John Doe">
+		  <certtype>client</certtype>
+		  <status>V</status>
+		  <expire-timestamp>191204173647Z</expire-timestamp>
+		  <serial>02</serial>
+		  <certpass/>
+		  <cert/>
+		  <key/>
+		  <pkcs12/>
+		  <req/>
+		</cert>
             </certs>
 
 	one pending, one rejected cert request
