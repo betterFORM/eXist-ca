@@ -3,7 +3,7 @@
 
 export EXISTCA_EXPORTPASS=export
 
-### Common enviroment variables that get passed to easyrsa
+### Common enviroment variables that get passed to easyrsa (easyrsa API)
 
 # basedir for the EasyRSA software.  needed to call easyrsa scripts
 export EASYRSA=$EXISTCA_HOME/../resources/easyrsa3
@@ -28,13 +28,22 @@ export EASYRSA_NO_VARS
 #export EASYRSA_SSL_CONF=$EXISTCA_HOME/data/openssl.cnf
 
 
+### utility shell functions
+
+# log a string to stdout and/or syslog
+logmsg () {
+    echo $*
+    [ -x /usr/bin/logger ] && logger -t eXistCA "$*"
+}
+
+# check all passed variables are defined as env vars, else complain
 checkenv () {
     TMPENV=`mktemp` || exit 1
     enverr=0
     env >$TMPENV
     for e in $*; do
 	if ! grep -q "$e" $TMPENV; then
-	    echo "required env var \"$e\" is undefined"
+	    logmsg "required env var \"$e\" is undefined"
 	    enverr=1
 	fi
     done
@@ -42,14 +51,17 @@ checkenv () {
     return $enverr
 }
 
-logmsg () {
-    echo $*
-    [ -x /usr/bin/logger ] && logger -t eXistCA "$*"
+# verify valid RSA keysize (key sizes that we support)
+verify_rsakeysize () {
+    ks=$1
+    case "$ks" in
+	1024|2048|4096|8192|16384) ;;
+	*) logmsg unsupported keysize $ks; return 1;;
+    esac
 }
 
-err_out () {
-    $errcode=$1
-    echo exiting with error code $errcode
-    exit $ercode
+# verify expire is a positive integer
+verify_expire () {
+    [[ $1 -gt 0 ]] || ( logmsg expire not positive int $1; return 1 )
 }
 
