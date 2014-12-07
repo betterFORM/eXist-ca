@@ -15,7 +15,6 @@ Sample data
 	    <expire/>
             <capass/>
             <expiry-date/>
-            <ca-cert-txt/>
             <country/>
             <province/>
             <city/>
@@ -31,6 +30,12 @@ Sample data
 		  <expire-timestamp/>
 		  <serial/>
 		  <certpass/>
+		  <country/>
+		  <province/>
+		  <city/>
+		  <org/>
+		  <org-unit/>
+		  <email/>
 		  <cert/>
 		  <key/>
 		  <pkcs12/>

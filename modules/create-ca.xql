@@ -23,9 +23,23 @@ let $options :=
            <env name="EXISTCA_CAKEYSIZE" value="{$config/keysize}"/>
            <env name="EXISTCA_CAEXPIRE" value="{$config/expire}"/>
            <env name="EXISTCA_CAPASS" value="{$config/capass}"/>
+           <env name="EXISTCA_CACOUNTRY" value="{$config/country}"/>
+           <env name="EXISTCA_CAPROVINCE" value="{$config/province}"/>
+           <env name="EXISTCA_CACITY" value="{$config/city}"/>
+           <env name="EXISTCA_CAORG" value="{$config/org}"/>
+           <env name="EXISTCA_CAOU" value="{$config/org-unit}"/>
+           <env name="EXISTCA_CAEMAIL" value="{$config/email}"/>
            <env name="EXISTCA_SRVNAME" value="{$config/@servername}"/>
            <env name="EXISTCA_SRVKEYSIZE" value="{$config/keysize}"/>
            <env name="EXISTCA_SRVEXPIRE" value="{$config/expire}"/>
+<!-- note "???" below
+           <env name="EXISTCA_SRVCOUNTRY" value="{$config/???/country}"/>
+           <env name="EXISTCA_SRVPROVINCE" value="{$config/???/province}"/>
+           <env name="EXISTCA_SRVCITY" value="{$config/???/city}"/>
+           <env name="EXISTCA_SRVORG" value="{$config/???/org}"/>
+           <env name="EXISTCA_SRVOU" value="{$config/???/org-unit}"/>
+           <env name="EXISTCA_SRVEMAIL" value="{$config/???/email}"/>
+-->
        </environment>
        <!-- myopt>myopt</myopt -->
    </options>
