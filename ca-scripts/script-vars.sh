@@ -38,7 +38,7 @@ logmsg () {
 
 # check all passed variables are defined as env vars, else complain
 checkenv () {
-    TMPENV=`mktemp` || exit 1
+    TMPENV=`mktemp tmp.XXXXXXXXXX` || exit 1
     enverr=0
     env >$TMPENV
     for e in $*; do
