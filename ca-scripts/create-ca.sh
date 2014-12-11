@@ -204,7 +204,7 @@ export EXISTCA_CAPASS EXISTCA_SRVPASS
 cd $EASYRSA
 
 # initialize CA infrastructure
-$FAKE ./easyrsa init-pki
+$FAKE sh ./easyrsa init-pki
 if [ $? -ne 0 ]; then
     logmsg "ERROR \"$THIS_CA\" - failed to initialize PKI directories"
     err=1
@@ -221,7 +221,7 @@ fi
 # create CA cert
 EXISTCA_AUTHIN=
 EXISTCA_AUTHOUT="env:EXISTCA_CAPASS"
-$FAKE ./easyrsa build-ca
+$FAKE sh ./easyrsa build-ca
 if [ $? -ne 0 ]; then
     logmsg "ERROR \"$THIS_CA\" - failed to create CA cert"
     err=1
@@ -255,7 +255,7 @@ else
     genreq_opt=nopass
 fi
 EXISTCA_AUTHIN=
-$FAKE ./easyrsa gen-req "$EASYRSA_REQ_CN" $genreq_opt
+$FAKE sh ./easyrsa gen-req "$EASYRSA_REQ_CN" $genreq_opt
 if [ $? -ne 0 ]; then
     logmsg "ERROR \"$THIS_CA\" - failed to generate web server certificate request"
     err=1
@@ -264,7 +264,7 @@ fi
 # sign web server cert request
 EXISTCA_AUTHIN="env:EXISTCA_CAPASS"
 EXISTCA_AUTHOUT=
-$FAKE ./easyrsa sign-req server "$EASYRSA_REQ_CN"
+$FAKE sh ./easyrsa sign-req server "$EASYRSA_REQ_CN"
 if [ $? -ne 0 ]; then
     logmsg "ERROR \"$THIS_CA\" - failed to sign web server certificate"
     err=1
@@ -278,7 +278,7 @@ else
     EXISTCA_AUTHIN=
     EXISTCA_AUTHPASS="env:EXISTCA_EXPORTPASS"
 fi
-$FAKE ./easyrsa export-p12 "$EASYRSA_REQ_CN"
+$FAKE sh ./easyrsa export-p12 "$EASYRSA_REQ_CN"
 if [ $? -ne 0 ]; then
     logmsg "ERROR \"$THIS_CA\" - failed to pkcs12 export web server certificate"
     err=1
