@@ -130,7 +130,7 @@ INDEX
     </cert>
   </certs>
 </CA>
-"
+" | tr -d '\n'
 }
 
 # source common script vars
