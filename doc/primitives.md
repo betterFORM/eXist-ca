@@ -30,7 +30,16 @@ should be available in eXistCA "Expert Mode".
 eXistCA should be able to support multiple CAs (eg testing and production). 
 The implementation MUST NOT assume a single CA instance.
 
+<JT from a technical point of view this is surely true but no so from a business and project management
+point of view. First, it is trivial to add such a capability later on as it's simply like 'wrapping' another
+data layer around the existing data.
+
+When developing, promoting and giving away existCA it might very well make sense to restrict it to a single CA first. Gives
+us additional potential for later AND reduces work for the first version.
+</JT
+
 ## Expert Mode
+<JT>another feature we can delay to a second or even third version </JT>
 
 eXistCA should be as easy to use as possible, hiding complexity from the end 
 user.  Advanced features should be available by selecting an "Expert Mode" 
@@ -55,6 +64,8 @@ We recommend a 4096 bit RSA key for the CA certificate. You may want to use
 a 2048 bit RSA key if you prefer faster operation and care less about 
 powerful attackers decrypting your communication (NSA and friends). You 
 may want to choose 8192 bit if you really worry.
+
+<JT>we should try to express this directly in the UI</JT>
 
 For user certificates we recommend 2048 bit RSA keys. Choose 1024 bit if you 
 don't worry much, choose 4096 bit if you do. For servers, 1024 bit may be 
@@ -85,6 +96,10 @@ using its own trusted certificate.
 This page will also be used when the admin chooses to create an additional 
 CA, without the Jetty/SSL automatism.
 
+<JT>do we need to ask if cert should be used for server whenever a new is created? Is this a use case - that you
+want to change the identity of your server?
+</JT>
+
 ## Admin displays a CA
 
 This page is the main working space for the CA admin.  It first displays 
@@ -95,6 +110,10 @@ It then displays a list of pending certificate requests waiting to be signed.
 A request can be selected from this list, and a button "sign request" allows 
 the CA admin to sign and create the selected cert.  The CA password must be 
 entered for this.
+
+<JT>we already discussed the problem of lost passwords. It's of course a nightmare to loose the CA key and therefore
+we should think about that. My idea was to store the password as a QR code and let the user print it and put it
+somewhere. Just put it here as the thought has no home yet ;)</JT>
 
 Next it displays a list of all issued certificates.  Filters would be 
 useful to see only valid/expired/revoked certs.  Valid and expired certs 
@@ -120,6 +139,7 @@ User enters a few parameters including his pass phrase, on submit a cert
 request is generated, waiting to be signed by the CA admin.
 
 The user may later pick up his cert from this page as well.
+<JT>will the user screen already be under TLS? At least there stays the problem of how to actually identify the user?</JT>
 
 # Usage Primitives (technical view)
 
@@ -144,6 +164,8 @@ which means creating a user password protected key pair along with some meta
 information ("John Doe").  The CA password is not required.
 - sign-cert will be run by the CA admin (CA password required) to sign the 
 cert and export it to PKCS12 format.  The user password is not required.
+<JT>but the user still needs to transmit the password in clear text during submission of a cert request right? We need
+and additional mechanism to make this transfer safe.</JT>
 
 ## create-ca
 
