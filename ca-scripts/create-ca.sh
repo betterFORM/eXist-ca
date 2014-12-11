@@ -30,6 +30,7 @@
 #   EXISTCA_SRVOU        (eg "CA")
 #   EXISTCA_SRVEMAIL     (eg "ca@example.org")
 #   EXISTCA_HOME        (eg /usr/local/eXistCA)
+#   EXISTCA XMLOUT      
 #   PKI_BASE
 #
 # This script returns the following exit codes:
@@ -64,6 +65,7 @@ REQ_ENV="\
  EXISTCA_SRVOU \
  EXISTCA_SRVEMAIL \
  EXISTCA_HOME \
+ EXISTCA_XMLOUT \
  PKI_BASE \
 "
 
@@ -82,7 +84,7 @@ fi
 
 # dump CA and server data as XML
 dump_xml () {
-set -x
+    #XML_OUT=${JETTY_HOME}/tmp/${THIS_CA}.xml
     ca_crt=`cat $EASYRSA_PKI/ca.crt`
     ca_key=`cat $EASYRSA_PKI/private/ca.key`
     srv_crt=`cat $EASYRSA_PKI/issued/${THIS_SRV}.crt`
@@ -130,7 +132,7 @@ INDEX
     </cert>
   </certs>
 </CA>
-" | tr -d '\n'
+" >$EXISTCA_XMLOUT
 }
 
 # source common script vars
