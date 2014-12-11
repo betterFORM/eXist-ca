@@ -82,6 +82,7 @@ fi
 
 # dump CA and server data as XML
 dump_xml () {
+set -x
     ca_crt=`cat $EASYRSA_PKI/ca.crt`
     ca_key=`cat $EASYRSA_PKI/private/ca.key`
     srv_crt=`cat $EASYRSA_PKI/issued/${THIS_SRV}.crt`
@@ -89,11 +90,11 @@ dump_xml () {
     #srv_pkcs12=`cat $EASYRSA_PKI/private/${THIS_SRV}.p12`
     srv_pkcs12='this is binary and needs encoding'
     srv_req=`cat $EASYRSA_PKI/reqs/${THIS_SRV}.req`
-    ca_serial=`tr -dc '[:xdigit:]' <$EASYRSA_PKI/serial`
+    ca_serial=`tr -dc "[:xdigit:]" <$EASYRSA_PKI/serial`
     read status expire serial unkn cn <<INDEX
 $(grep "$THIS_SRV" $EASYRSA_PKI/index.txt)
 INDEX
-    exp_date=`openssl x509 -text -in $EASYRSA_PKI/issued/${THIS_SRV}.crt | grep "Not After" | sed 's/.*Not After : //;`
+#    exp_date=`openssl x509 -text -in $EASYRSA_PKI/issued/${THIS_SRV}.crt | grep "Not After" | sed 's/.*Not After : //;`
     printf "
 <CA name=\"$THIS_CA\" nicename=\"$EXISTCA_CANAME\" servername=\"$THIS_SRV\">
   <keysize>$EXISTCA_CAKEYSIZE</keysize>
