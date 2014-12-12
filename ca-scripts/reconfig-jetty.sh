@@ -52,7 +52,7 @@ $FAKE $JAVA_HOME/bin/keytool -import -alias $THIS_CA -file $CA_CERT -keystore $J
 
 # rewrite jetty.xml file
 cd ${JETTY_HOME}/etc && cp jetty.xml jetty.xml.bak \
-    && sed -e "s/8443/443/;" <jetty.xml.bak >jetty.xml
+#    && sed -e "s/8443/443/;" <jetty.xml.bak >jetty.xml
 #    && sed -e "s/secret/${USE_PW}/; s/8443/443/;" <jetty.xml.bak >jetty.xml
 #    && sed -e "s/secret/${CRYPTPW}/; s/8443/443/;" <jetty.xml.bak >jetty.xml
 

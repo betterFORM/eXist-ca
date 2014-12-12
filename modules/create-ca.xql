@@ -85,21 +85,16 @@ let $options :=
            <env name="PKI_BASE" value="{$ca-home || '/pki'}"/>
            <env name="JETTY_HOME" value="{$existca:jetty-home}"/>
            <env name="EXISTCA_XMLOUT" value="{$cert-tmp}"/>
+           <env name="JAVA_HOME" value="{environment-variable("JAVA_HOME")}"/>
            
        </environment>
    </options>
-
-
  
 let $result := (process:execute(("sh", "create-ca.sh"), $options))
 
-(: import the generated xml from create-ca.sh :)
 let $generated-cert-file:=file:read($cert-tmp)
 
-(: when completely successful or at least having generated the cert we store it. 
- : Do we need some exception messaging here?
- :)
-let $foo := if($result/@exitCode=0 or $result/@exitCode=4) then
+let $foo := if($result/@exitCode=0) then
         let $uuid := util:uuid()
         let $resourceName := $data/@name || ".xml"
         return xmldb:store($cert-data-collection, $resourceName, $generated-cert-file)
@@ -107,3 +102,16 @@ else ()
      
 
 return $result
+(:return $generated-cert-file:)
+
+(:let $uuid := util:uuid() :)
+
+(: this part does not work for some reason :)
+(:let $new-data := update value $data/CA/@id with string($uuid):)
+
+(:
+let $resourceName := data($uuid) || ".xml"
+let $stored :=  xmldb:store($cert-data-collection, $resourceName, $data)
+return $data
+
+:)

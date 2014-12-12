@@ -298,7 +298,7 @@ if [ $err -ne 0 ]; then
 fi
 
 # install generated web server cert into eXist config
-export SERVER_P12=${PKI_BASE}/${THIS_CA}/private/${EXISTCA_SRVNAME}.p12
+export SERVER_P12=${PKI_BASE}/${THIS_CA}/private/${THIS_SRV}.p12
 export CA_CERT=${PKI_BASE}/${THIS_CA}/ca.crt
 export EXISTCA_HOME THIS_CA
 
