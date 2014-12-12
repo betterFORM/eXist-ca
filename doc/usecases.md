@@ -102,7 +102,7 @@ At any time the Cert Admin can list all certs issued for a given CA.
 ### Steps
 
 ## 9. install cert
-### Actor: Cert User
+### Actor: Cert User, Cert Admin
 ### Steps
 
 ## 10. request renewal

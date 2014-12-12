@@ -6,7 +6,7 @@ export EXISTCA_EXPORTPASS=export
 ### Common enviroment variables that get passed to easyrsa (easyrsa API)
 
 # basedir for the EasyRSA software.  needed to call easyrsa scripts
-export EASYRSA=$EXISTCA_HOME/../resources/easyrsa3
+export EASYRSA=$EXISTCA_HOME/easyrsa
 #export EASYRSA=$EXISTCA_HOME/easyrsa3
 
 # set batch mode

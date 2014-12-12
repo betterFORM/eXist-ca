@@ -4,65 +4,57 @@
         <title/>
         <link rel="stylesheet" href="resources/css/bootstrap.min.css"/>
         <link rel="stylesheet" href="resources/css/font-awesome.min.css"/>
+        <link rel="stylesheet" href="resources/css/animate.min.css"/>
         <link rel="stylesheet" href="resources/css/styles.css"/>
     </head>
     <body class="xforms">
         <div style="display:none;">
             <xf:model id="m-ca">
-                <xf:instance xmlns="">
-                    <existca>
-              <!-- system config data if running on an appliance, eg network config -->
-                        <appliance/>
-            
-                  <!-- container for all CAs -->
-                        <CAs>
-                            <CA name="">
-                                <keysize>4096</keysize>
-                                <expire>1095</expire>
-                                <servername/>
-                                <capass/>
-                                <!-- <expiry-date/> -->
-                                <!-- <ca-cert-txt/> -->
-                                <country/>
-                                <province/>
-                                <city/>
-                                <org/>
-                                <org-unit/>
-                                <email/>
-                                <certs>
-                                    <cert name="" type="" serial=""/>
-                                </certs>
-                                <pending-requests>
-                                    <req name="" type=""/>
-                                </pending-requests>
-                                <rejected-requests>
-                                    <req name="" type="" rej-reason=""/>
-                                </rejected-requests>
-                            </CA>
-                        </CAs>
-                    </existca>
+                <xf:instance xmlns="" id="i-default">
+                    <CA id="" name="">
+                        <keysize/>
+                        <expire/>
+                        <servername/>
+                        <capass/>
+                        <expiry-date/> 
+                        <!-- <ca-cert-txt/> -->
+                        <country/>
+                        <province/>
+                        <city/>
+                        <org/>
+                        <org-unit/>
+                        <email/>
+                        <certs>
+                            <cert name="" type="" serial=""/>
+                        </certs>
+                        <pending-requests>
+                            <req name="" type=""/>
+                        </pending-requests>
+                        <rejected-requests>
+                            <req name="" type="" rej-reason=""/>
+                        </rejected-requests>
+                        <!-- valid | requested | expired | revoked -->
+                        <status>valid</status>
+                    </CA>
                 </xf:instance>
-                <xf:intance xmlns="" id="i-vars">
-                    <data>
-                        <capass2/>
-                        <cert name="" type="" serial="" keysize="" expire=""/>
-                    </data>
-                </xf:intance>
-                <xf:bind ref="CAs">
-                    <xf:bind ref="CA">
-                        <xf:bind ref="@name" required="true()"/>
-                        <xf:bind ref="keysize" required="true()"/>
-                        <xf:bind ref="expire" required="true()" type="xf:integer"/>
-                        <xf:bind ref="capass" required="true()" constraint=". = instance('i-vars')/capass2"/>
-                        <xf:bind ref="org" required="true()"/>
-                        <xf:bind ref="country" required="true()"/>
-                    </xf:bind>
+                <xf:bind ref="instance('i-default')">
+                    <xf:bind ref="@name" required="true()"/>
+                    <xf:bind ref="keysize" required="true()"/>
+                    <xf:bind ref="expire" required="true()" type="xf:integer"/>
+                    <xf:bind ref="capass" required="true()"/>
+                    <xf:bind ref="expiry-date"/>
                 </xf:bind>
                 <xf:submission id="s-createCA" method="post" replace="none" resource="modules/create-ca.xql">
                     <xf:action ev:event="xforms-submit-error">
-                        <xf:message>Something went terribly wrong</xf:message>
+                        <xf:message level="ephemeral">Something went terribly wrong</xf:message>
+                    </xf:action>
+                    <xf:action ev:event="xforms-submit-done">
+                        <xf:message level="ephemeral">Root certificate successfully created</xf:message>
+                        <xf:toggle case="home"/>
                     </xf:action>
                 </xf:submission>
+                
+<!--                <xf:instance id="i-CAs" xmlns="" src="data/getCAs.xql"/>-->
                 <xf:instance xmlns="" id="i-vars">
                     <data>
                         <retype/>
@@ -70,49 +62,76 @@
                     </data>
                 </xf:instance>
                 <xf:bind ref="instance('i-vars')">
-                    <xf:bind ref="retype" constraint=". = instance()/caPass" required="true()"/>
+                    <xf:bind ref="retype" constraint=". eq instance('i-default')/capass" required="true()"/>
                 </xf:bind>
                 <xf:instance xmlns="" id="i-countries" src="data/countries.xml"/>
+                <xf:instance xmlns="" id="i-CAs">
+                    <data/>
+                </xf:instance>
+                <xf:submission id="s-load-cas" resource="modules/get-ca.xql" method="get" replace="instance" ref="instance('i-CAs')"/>
+                <xf:action ev:event="xforms-ready">
+                    <xf:send submission="s-load-cas"/>
+                    <xf:toggle case="create-ca" if="not(exists(instance('i-CAs')/CA))"/>
+                </xf:action>
             </xf:model>
         </div>
+        <!--
         <header>
-            <xf:trigger class="-btn -btn-default">
-                <xf:label>
-                    <i class="fa fa-arrow-left"/>
-                </xf:label>
+            <div class="button-bar">
+                <xf:trigger class="-btn -btn-default">
+                    <xf:label>
+                        <i class="fa fa-arrow-left"/>
+                    </xf:label>
+                    <xf:toggle case="home"/>
+                </xf:trigger>
+                <xf:trigger id="ca-config" class="-btn -btn-default">
+                    <xf:label>
+                        <i class="fa fa-institution"/>
+                    </xf:label>
+                    <xf:toggle case="create-ca"/>
+                </xf:trigger>
+            </div>
+        </header>
+        -->
+        <div class="app-name">
+        <!--
+            <xf:trigger>
+                <xf:label>flip</xf:label>
                 <xf:toggle case="home"/>
             </xf:trigger>
-            <xf:trigger id="ca-config" class="-btn -btn-default">
-                <xf:label>Settings <i class="fa fa-gears"/>
-                </xf:label>
-                <xf:toggle case="create-ca"/>
-            </xf:trigger>
-        </header>
-        <div class="app-name">
+            <xf:trigger id="dummy">
+                <xf:label>toggle</xf:label>
+                <xf:toggle case="cert"/>
+            </xf:trigger> -->
             <i class="fa fa-key"/>MeCastle</div>
-        <xf:switch id="views" class="bf-panel">
-            <xf:case id="home">
-<!--                    <ul id="menu">
-                        <li>
-                            <xf:trigger id="ca-cert" class="-btn -btn-primary">
-                                <xf:label>Create CA <i class="fa fa-chevron-right"/></xf:label>
-                                <xf:toggle case="create-ca"/>
-                            </xf:trigger>
-                        </li>
-                        <li/>
-                            <xf:trigger class="-btn -btn-primary">
-                                <xf:label>Create CA</xf:label>
-                                <xf:toggle case="create-ca"/>
-                            </xf:trigger>
-                        <li/>
-                        <li/>
-                            <xf:trigger class="-btn -btn-primary">
-                                <xf:label>Create CA</xf:label>
-                                <xf:toggle case="create-ca"/>
-                            </xf:trigger>
-                        <li/>
-                    </ul>
--->
+        <xf:switch id="views" class="bf-panel fadeIn animated">
+            <xf:case id="CA-home">
+                <h2>Your trustchains</h2>
+                <!--
+                <xf:repeat ref="CAs/CA" appearance="minimal">
+                    <xf:output ref="@name" class="ca-name">
+                        <xf:label/>
+                    </xf:output>
+                    <xf:output ref="expire" class="ca-expires">
+                        <xf:label/>
+                    </xf:output>
+                    <xf:output value="days-to-date(days-from-date(now())+ expire)">
+                        <xf:label>date:</xf:label>
+                    </xf:output>
+                </xf:repeat>
+                -->
+            </xf:case>
+            <xf:case id="home" selected="true">
+                <xf:action ev:event="xforms-select">
+                    <script>
+                        $("#home").addClass("fadeInLeft animated");
+                    </script>
+                </xf:action>
+                <xf:action ev:event="xforms-deselect">
+                    <script>
+                        $("#home").removeClass("fadeInLeft animated");
+                    </script>
+                </xf:action>
                 <h3>All Certificates</h3>
                 <table class="table table-hover cert-list ">
                     <thead>
@@ -155,18 +174,79 @@
                     </tr>
                 </table>
             </xf:case>
-            <xf:case id="create-ca">
+            <xf:case id="create-ca" selected="true">
+                <xf:action ev:event="xforms-select">
+                    <script>
+                        $("#create-ca").addClass("fadeInDown animated");
+                    </script>
+                </xf:action>
+                <xf:action ev:event="xforms-deselect">
+                    <script>
+                        $("#create-ca").removeClass("fadeOutUp animated");
+                    </script>
+                </xf:action>
+                <i id="reload" class="fa fa-rotate-left btn"/>
                 <h3>Your Certificate Authority</h3>
-                <xf:group appearance="compact" ref="CAs/CA">
+                <xf:group id="summary" appearance="minimal">
+                    <img src="resources/images/gray-cert-light.png"/>
+                    <div class="cert-text">
+                        <xf:output ref="@name" class="summary-long summary-name">
+                            <xf:label>CA Name</xf:label>
+                        </xf:output>
+                        <xf:output ref="keysize" class="summary-short summary-keysize">
+                            <xf:label>Key length</xf:label>
+                        </xf:output>
+                        <xf:output ref="expiry-date" class="summary-short summary-expire">
+                            <xf:label>Expires</xf:label>
+                        </xf:output>
+                    </div>
+                </xf:group>
+                <ol class="carousel-indicators">
+                    <li class="active"/>
+                    <li/>
+                    <li/>
+                    <li/>
+                    <li/>
+                    <li/>
+                </ol>
+                <xf:group class="CA-form" appearance="compact">
                     <ul>
-                        <li>
-                            <xf:input ref="@name" class="-form-control">
+                        <li class="name-item">
+                            <xf:input id="ca-name" ref="@name" class="-form-control" autofocus="autofocus">
                                 <xf:label>CA Name</xf:label>
+                                <xf:action ev:event="xforms-value-changed">
+                                    <script>
+                                        $(".name-item &gt; input").addClass("fadeOutUp animated");
+
+                                        $(".summary-name").addClass("fadeInUp animated");
+                                        
+                                        $(".name-item").addClass("hidden");
+
+                                        $(".keysize-item").removeClass("hidden");
+                                        $(".keysize-item").addClass("fadeInUp animated");
+                                        
+                                        $(".carousel-indicators .active").removeClass("active");
+                                        $(".carousel-indicators li:nth-child(2)").addClass("active");
+                                    </script>
+                                </xf:action>
                             </xf:input>
-                            <div class="hint">The name of your certificate authority e.g. 'my-site.com'</div>
+                            <div class="alert alert-info">
+                                <i class="fa fa-info"/>
+                            The name of your certificate authority e.g. 'my-site.com'</div>
                         </li>
-                        <li>
-                            <xf:select1 ref="keysize" selection="closed" class="-form-control">
+                        <li class="keysize-item hidden">
+                        <!--
+                            <xf:trigger class="keysize-btn 2048 -btn -btn-warning">
+                                <xf:label>2048</xf:label>
+                            </xf:trigger>
+                            <xf:trigger class="keysize-btn 4096  -btn -btn-warning">
+                                <xf:label>4096</xf:label>
+                            </xf:trigger>
+                            <xf:trigger class="keysize-btn 8192 -btn -btn-warning">
+                                <xf:label>8182</xf:label>
+                            </xf:trigger>
+                        -->
+                            <xf:select1 id="key-size" ref="keysize" selection="closed" class="-form-control" appearance="full" incremental="true">
                                 <xf:label>Keysize</xf:label>
                                 <xf:item>
                                     <xf:label>2048 bit</xf:label>
@@ -180,60 +260,145 @@
                                     <xf:label>8192 bit</xf:label>
                                     <xf:value>8192</xf:value>
                                 </xf:item>
+                                <xf:action ev:event="xforms-value-changed">
+                                    <script>
+                                        $(".keysize-item &gt; input").addClass("fadeOutUp animated");
+
+                                        $(".summary-keysize").addClass("fadeInUp animated");
+                                        
+                                        $(".keysize-item").addClass("hidden");
+
+                                        $(".expire-item").removeClass("hidden");
+                                        $(".expire-item").addClass("fadeInUp animated");
+
+                                        $(".carousel-indicators .active").removeClass("active");
+                                        $(".carousel-indicators li:nth-child(3)").addClass("active");
+                                    </script>
+                                </xf:action>
                             </xf:select1>
-                            <div class="hint">The length of the encryption key</div>
+                            <div class="alert alert-info">
+                                <i class="fa fa-info"/>The length of the encryption key. The longer the key the more
+                                secure the encryption. However long keys take more processsion power and might slow down
+                                your server.
+                            </div>
                         </li>
-                        <li>
-                            <xf:select1 ref="expire" selection="closed" class="-form-control">
+                        <li class="expire-item hidden">
+                            <xf:select1 ref="expire" selection="closed" class="-form-control" appearance="full" incremental="true">
                                 <xf:label>Expires</xf:label>
                                 <xf:item>
                                     <xf:label>1 year</xf:label>
                                     <xf:value>365</xf:value>
                                 </xf:item>
-                                <xf:item>
-                                    <xf:label>2 years</xf:label>
-                                    <xf:value>730</xf:value>
-                                </xf:item>
+<!--                                <xf:item>-->
+<!--                                    <xf:label>2 years</xf:label>-->
+<!--                                    <xf:value>730</xf:value>-->
+<!--                                </xf:item>-->
                                 <xf:item>
                                     <xf:label>3 years</xf:label>
                                     <xf:value>1095</xf:value>
                                 </xf:item>
-                                <xf:item>
-                                    <xf:label>4 years</xf:label>
-                                    <xf:value>1460</xf:value>
-                                </xf:item>
+<!--                                <xf:item>-->
+<!--                                    <xf:label>4 years</xf:label>-->
+<!--                                    <xf:value>1460</xf:value>-->
+<!--                                </xf:item>-->
                                 <xf:item>
                                     <xf:label>5 years</xf:label>
                                     <xf:value>1825</xf:value>
                                 </xf:item>
+                                <xf:action ev:event="xforms-value-changed">
+                                    <xf:setvalue ref="../expiry-date" value="days-to-date(days-from-date(now()) + ../expire)"/>
+                                    <script>
+                                        $(".expire-item &gt; input").addClass("fadeOutUp animated");
+
+                                        $(".summary-expire").addClass("fadeInUp animated");
+                                        
+                                        $(".expire-item").addClass("hidden");
+
+                                        $(".pass-item").removeClass("hidden");
+                                        $(".pass-item").addClass("fadeInUp animated");
+                                        
+                                        $(".carousel-indicators .active").removeClass("active");
+                                        $(".carousel-indicators li:nth-child(4)").addClass("active");
+                                    </script>
+                                </xf:action>
                             </xf:select1>
-                            <div class="hint">The duration of validity.</div>
+                            <div class="alert alert-info">
+                                <i class="fa fa-info"/>The duration of validity.</div>
                         </li>
-                        <li>
+                        <li class="pass-item hidden">
                             <xf:secret ref="capass" class="-form-control">
                                 <xf:label>CA Password</xf:label>
                             </xf:secret>
-                        </li>
-                        <li>
-                            <xf:secret ref="instance('i-vars')/retype" class="-form-control">
+                            <xf:secret ref="instance('i-vars')/retype" class="-form-control hidden">
                                 <xf:label>Retype CA password</xf:label>
                                 <xf:alert>Passwords do not match</xf:alert>
+                                <xf:action ev:event="xforms-value-changed" if=". = instance('i-default')/capass">
+                                    <script>
+                                        $(".pass-item &gt; input").addClass("fadeOutUp animated");
+
+                                        $(".pass-item").addClass("hidden");
+
+                                        $(".server-item").removeClass("hidden");
+                                        $(".server-item").addClass("fadeInUp animated");
+                                        $(".carousel-indicators .active").removeClass("active");
+                                        $(".carousel-indicators li:nth-child(5)").addClass("active");
+                                    </script>
+                                </xf:action>
                             </xf:secret>
+                            <div class="alert alert-danger">
+                                <i class="fa fa-exclamation-circle"/>
+                            Please make sure that you keep this password in a safe place. If you loose this password you'll loose
+                            access to your encrypted data - bla </div>
                         </li>
-                        <li>
-                            <xf:input ref="servername" class="-form-control">
+                        <li class="server-item hidden">
+                            <xf:input ref="servername" class="-form-control hidden">
                                 <xf:label>Hostname</xf:label>
                                 <xf:hint>existca.example.org</xf:hint>
+                                <xf:action ev:event="xforms-value-changed">
+                                    <script>
+                                        $(".server-item &gt; input").addClass("fadeOutUp animated");
+
+                                        $(".server-item").addClass("hidden");
+
+                                        $(".btn-group").removeClass("hidden");
+                                        $(".btn-group").addClass("fadeInUp animated");
+                                        $(".carousel-indicators .active").removeClass("active");
+                                        $(".carousel-indicators li:nth-child(6)").addClass("active");
+                                    </script>
+                                </xf:action>
                             </xf:input>
+                            <div class="alert alert-info">
+                                <i class="fa fa-info"/>The name of your server...</div>
                         </li>
-                        <li class="btn-group">
-                            <xf:trigger class="-btn -btn-default create-ca">
+                        <li class="btn-group hidden">
+                            <xf:trigger class="-btn -btn-success -btn-lg create-ca">
                                 <xf:label>Create</xf:label>
-                                <xf:send submission="s-createCA"/>
+                                <xf:action>
+                                    <xf:send submission="s-createCA"/>
+                                    <script>
+                                        $(".progress .step").addClass("slideInLeft animated");
+                                    </script>
+                                </xf:action>
                             </xf:trigger>
                         </li>
                     </ul>
                 </xf:group>
+<!--                <div class="progress">-->
+<!--                    <span class="step step1"/>-->
+<!--                </div>-->
+            </xf:case>
+            <xf:case id="cert">
+                <xf:action ev:event="xforms-select">
+                    <script>
+                        $("#cert").addClass("fadeInRight animated");
+                    </script>
+                </xf:action>
+                <xf:action ev:event="xforms-deselect">
+                    <script>
+                        $("#cert").removeClass("fadeInRight animated");
+                    </script>
+                </xf:action>
+                <h1>Cert Details</h1>
             </xf:case>
             <xf:case id="expert">
                 <xf:group appearance="full" ref="CAs/CA">
@@ -303,9 +468,18 @@
 <!--        </menu>-->
         <script type="text/javascript" src="resources/scripts/jquery.min.js"/>
         <script>
-            $("tr").on("click",function(){
-                console.log("tr clicked");    
+        $(document).ready(function() {
+            fluxProcessor.skipShutdown=true;
+            
+            $("#reload").on("click",function(){
+                window.location.reload();    
             });
+            
+            $("tr").on("click",function(){
+                console.log("tr clicked"); 
+                fluxProcessor.dispatchEvent("dummy");
+            });
+        });
         </script>
     </body>
 </html>

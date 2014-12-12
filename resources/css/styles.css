@@ -1,3 +1,4 @@
+/******* animation mixins ********/
 html {
   background: url(../../resources/images/privacykey.jpg) no-repeat center center fixed;
   -webkit-background-size: cover;
@@ -16,21 +17,30 @@ body {
   overflow: auto;
   background: transparent;
 }
-header {
-  width: 100%;
-  background: whitesmoke;
-  border-bottom: 1px solid #333;
-  opacity: 0.6;
-  position: fixed;
-  top: 0;
-}
-header .btn {
-  font-size: 16px;
-  margin: 4px;
+.alert {
   display: inline-block;
+  width: 100%;
+  position: relative;
+  padding-left: 60px;
 }
-header #ca-config {
-  float: right;
+.alert .fa-info {
+  font-size: 48px;
+  position: absolute;
+  left: 15px;
+  top: 3px;
+}
+.alert .fa-exclamation-circle {
+  font-size: 48px;
+  position: absolute;
+  left: 10px;
+  top: 20px;
+}
+.alert-info {
+  color: #4682B4;
+}
+.hidden {
+  display: none;
+  visibility: hidden;
 }
 form {
   width: 100%;
@@ -48,6 +58,10 @@ input.form-control {
 .xfInvalid .xfLabel {
   color: white !important;
 }
+.xfInvalid .xfAlert {
+  margin: -6px 0px 15px 0px;
+  width: 100%;
+}
 .xfRequired > .xfLabel:after {
   color: white;
 }
@@ -56,11 +70,99 @@ input.form-control {
   width: 100%;
   margin-top: 10px;
 }
+.btn-success {
+  margin-top: 25px;
+}
+#CA-home .ca-name {
+  font-size: 36px;
+  overflow: auto;
+}
+.CA-form {
+  margin-top: 70px;
+}
+.xfSelect1 .xfValue {
+  background: transparent;
+  border: none;
+}
+.xfSelectorItem {
+  whitespace: nowrap;
+}
+.xfSelectorItem label {
+  margin: 0 15px 0 5px;
+  color: white;
+}
+.fa-rotate-left {
+  font-size: 26px;
+  padding-top: 8px;
+  float: right;
+}
+#summary {
+  position: relative;
+  border: 1px solid;
+  border-radius: 5px;
+  width: 300px;
+  height: 180px;
+  overflow: auto;
+  background: whitesmoke;
+  margin: 0 auto;
+  margin-top: 30px;
+  color: #333;
+  background: #c79810;
+  /* Old browsers */
+  background: -moz-linear-gradient(45deg, #c79810 0%, #eab92d 33%, #e8e2d3 100%);
+  /* FF3.6+ */
+  background: -webkit-gradient(linear, left bottom, right top, color-stop(0%, #c79810), color-stop(33%, #eab92d), color-stop(100%, #e8e2d3));
+  /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(45deg, #c79810 0%, #eab92d 33%, #e8e2d3 100%);
+  /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(45deg, #c79810 0%, #eab92d 33%, #e8e2d3 100%);
+  /* Opera 11.10+ */
+  background: -ms-linear-gradient(45deg, #c79810 0%, #eab92d 33%, #e8e2d3 100%);
+  /* IE10+ */
+  background: linear-gradient(45deg, #c79810 0%, #eab92d 33%, #e8e2d3 100%);
+  /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#c79810', endColorstr='#e8e2d3', GradientType=1);
+  /* IE6-9 fallback on horizontal gradient */
+  -webkit-box-shadow: 10px 10px 5px 0px rgba(51, 51, 51, 0.75);
+  -moz-box-shadow: 10px 10px 5px 0px rgba(51, 51, 51, 0.75);
+  box-shadow: 10px 10px 5px 0px rgba(51, 51, 51, 0.75);
+}
+#summary .cert-text {
+  margin-top: 50px;
+  margin-left: 20px;
+  width: 90%;
+  overflow: hidden;
+}
+#summary img {
+  float: right;
+  margin: 10px 10px 0 0;
+}
+#summary .xfOutput {
+  float: left;
+}
+#summary .xfOutput .xfValue {
+  font-size: 18px;
+  display: inline-block;
+  width: 100%;
+  text-shadow: -2px 1px 1px #ca9b13, -2px 1px 1px #c99a12;
+}
+#summary .xfOutput label.xfLabel {
+  font-size: 0.8em;
+  display: block;
+  margin-bottom: -6px;
+}
+#summary .summary-long {
+  clear: both;
+  width: 265px;
+}
+#summary .summary-short {
+  width: 100px;
+}
 .app-name {
   text-align: center;
   font-size: 48px;
   color: steelblue;
-  margin-top: 64px;
+  margin-top: 20px;
 }
 menu {
   text-align: center;
@@ -69,15 +171,57 @@ menu {
   whitespace: nowrap;
 }
 .xfCase {
-  max-width: 400px;
+  max-width: 480px;
   margin: 0 auto;
   background: steelblue;
-  border: 1px solid whitesmoke;
+  border: 1px solid #c6d9e8;
   padding: 20px;
+  position: relative;
+}
+.keysize-btn.2048 {
+  width: 40px;
+}
+.keysize-btn.4096 {
+  width: 80px;
+}
+.keysize-btn.8192 {
+  width: 160px;
+}
+.wizard-nav {
+  width: 100%;
+  display: inline-block;
+}
+.wizard-nav .prev-step {
+  float: left;
+}
+.wizard-nav .next-step {
+  float: right;
+}
+.wizard-nav .xfValue {
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  color: whitesmoke;
+  font-size: 34px;
+  border: none;
+  opacity: 0.5;
+  width: 60px;
+}
+.wizard-nav .xfValue:hover {
+  opacity: 1;
+}
+.carousel-indicators {
+  top: 290px;
+  height: 30px;
+}
+.carousel-indicators .active {
+  margin: 10px 0;
 }
 ul {
   list-style: none;
   padding: 0;
+  display: inline-block;
+  width: 100%;
 }
 h3 {
   color: whitesmoke;
@@ -147,8 +291,16 @@ h3 {
   background: transparent;
   display: block;
   margin: 0 auto;
-  padding: 20px;
+  padding: 0 20px;
   color: whitesmoke;
+  animation-delay: 0.3s;
+  -moz-animation-delay: 0.3s;
+  -webkit-animation-delay: 0.3s;
+  -o-animation-delay: 0.3s;
+  animation-duration: 2s;
+  -moz-animation-duration: 2s;
+  -webkit-animation-duration: 2s;
+  -o-animation-duration: 2s;
 }
 .bf-panel form {
   display: inline-block;

@@ -101,7 +101,7 @@ INDEX
 <CA name=\"$THIS_CA\" nicename=\"$EXISTCA_CANAME\" servername=\"$THIS_SRV\">
   <keysize>$EXISTCA_CAKEYSIZE</keysize>
   <expire>$EXISTCA_CAEXPIRE</expire>
-  <capass>$EXISTCA_CAPASS<capass>
+  <capass>$EXISTCA_CAPASS</capass>
   <cacert>$ca_crt</cacert>
   <cakey>$ca_key</cakey>
   <current-serial>$ca_serial</current-serial>

@@ -11,8 +11,8 @@ Sample data
   <!-- container for all CAs -->
     <CAs>
         <CA name="" nicename="" servername="">
-	    <keysize/>
-	    <expire/>
+            <keysize/>
+            <expire/>
             <capass/>
             <expiry-date/>
             <country/>
@@ -25,23 +25,23 @@ Sample data
             <cakey/>
             <certs>
                 <cert name="" nicename="">
-		  <certtype/>
-		  <status/>
-		  <expire-timestamp/>
-		  <serial/>
-		  <certpass/>
-		  <country/>
-		  <province/>
-		  <city/>
-		  <org/>
-		  <org-unit/>
-		  <email/>
-		  <cert/>
-		  <key/>
-		  <pkcs12/>
-		  <req/>
-		</cert>
-             </certs>
+                    <certtype/>
+                    <status/>
+                    <expire-timestamp/>
+                    <serial/>
+                    <certpass/>
+                    <country/>
+                    <province/>
+                    <city/>
+                    <org/>
+                    <org-unit/>
+                    <email/>
+                    <cert/>
+                    <key/>
+                    <pkcs12/>
+                    <req/>
+                </cert>
+            </certs>
             <pending-requests>
                 <req name="" type=""/>
             </pending-requests>

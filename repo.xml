@@ -11,4 +11,5 @@
     <target>eXistCA</target>
     <prepare>pre-install.xql</prepare>
     <finish>post-install.xql</finish>
+    <permissions xmlns:repo="http://exist-db.org/xquery/repo" password="" mode="755"/>
 </meta>
