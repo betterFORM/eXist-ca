@@ -70,21 +70,22 @@ let $options :=
            <env name="EXISTCA_CAORG" value="{$data/org}"/>
            <env name="EXISTCA_CAOU" value="{$data/org-unit}"/>
            <env name="EXISTCA_CAEMAIL" value="{$data/email}"/>
+
            <env name="EXISTCA_SRVNAME" value="{$data/@servername}"/>
            <env name="EXISTCA_SRVPASS" value="{$data/capass}"/>
            <env name="EXISTCA_SRVKEYSIZE" value="{$data/keysize}"/>
            <env name="EXISTCA_SRVEXPIRE" value="{$data/expire}"/>
-           <env name="EXISTCA_HOME" value="{$ca-home}"/>
-
            <env name="EXISTCA_SRVCOUNTRY" value="{$data/country}"/>
            <env name="EXISTCA_SRVPROVINCE" value="{$data/province}"/>
            <env name="EXISTCA_SRVCITY" value="{$data/city}"/>
            <env name="EXISTCA_SRVORG" value="{$data/org}"/>
            <env name="EXISTCA_SRVOU" value="{$data/org-unit}"/>
            <env name="EXISTCA_SRVEMAIL" value="{$data/email}"/>
+
+           <env name="EXISTCA_XMLOUT" value="{$cert-tmp}"/>
+           <env name="EXISTCA_HOME" value="{$ca-home}"/>
            <env name="PKI_BASE" value="{$ca-home || '/pki'}"/>
            <env name="JETTY_HOME" value="{$existca:jetty-home}"/>
-           <env name="EXISTCA_XMLOUT" value="{$cert-tmp}"/>
            <env name="JAVA_HOME" value="{environment-variable("JAVA_HOME")}"/>
            
        </environment>
