@@ -38,32 +38,22 @@ verify_expire () {
 }
 
 
-# export JAVA_HOME, complain if undefined
-if [ -z "$JAVA_HOME" ]; then
-    logmsg "JAVA_HOME undefined"
-    exit 1
-fi
-export JAVA_HOME
-
-
-export EXISTCA_EXPORTPASS=export
+# PKCS12 export password
+#export EXISTCA_EXPORTPASS=export
+export EXISTCA_EXPORTPASS=secret
 
 ### Common enviroment variables that get passed to easyrsa (easyrsa API)
 
 # basedir for the EasyRSA software.  needed to call easyrsa scripts
 export EASYRSA=$EXISTCA_HOME/easyrsa
-#export EASYRSA=$EXISTCA_HOME/easyrsa3
 
 # set batch mode
 export EASYRSA_BATCH=yes
 
+# if "org" add city/country etc to certs.  else use simple common name
+export EASYRSA_DN=org
+
 # reset some env vars
-export EASYRSA_REQ_ORG=
-export EASYRSA_REQ_OU=
-export EASYRSA_REQ_CITY=
-export EASYRSA_REQ_PROVINCE=
-export EASYRSA_REQ_COUNTRY=
-export EASYRSA_REQ_EMAIL=
 export EASYRSA_NS_COMMENT=
 
 # do not parse any kind of easyrsa vars file
