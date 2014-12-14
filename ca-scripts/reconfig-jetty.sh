@@ -52,10 +52,16 @@ $FAKE $JAVA_HOME/bin/keytool -importkeystore -srckeystore $SERVER_P12 -srcstoret
 #$FAKE $JAVA_HOME/bin/keytool -import -alias $THIS_CA -file $CA_CERT -keystore $JETTY_KEYSTORE -storepass "$USE_PW" -noprompt
 
 # rewrite jetty.xml file
-cd ${JETTY_HOME}/etc && cp jetty.xml jetty.xml.bak \
-#    && sed -e "s/8443/443/;" <jetty.xml.bak >jetty.xml
-#    && sed -e "s/secret/${USE_PW}/; s/8443/443/;" <jetty.xml.bak >jetty.xml
-#    && sed -e "s/secret/${CRYPTPW}/; s/8443/443/;" <jetty.xml.bak >jetty.xml
+JETTY_XML_SRC=$EXISTCA_HOME/jetty-samples/example-jetty.xml
+cp $JETTY_XML_SRC $JETTY_HOME/etc
+#cd ${JETTY_HOME}/etc \
+#    && sed -e "s/8443/443/;" <$JETTY_XML_SRC >jetty.xml
+#    && sed -e "s/secret/${USE_PW}/; s/8443/443/;" <$JETTY_XML_SRC >jetty.xml
+#    && sed -e "s/secret/${CRYPTPW}/; s/8443/443/;" <$JETTY_XML_SRC >jetty.xml
+
+# patch webdefaults.xml to support cert mime types
+# XXX work in progress, for now we copy our sample file
+cp $EXISTCA_HOME/jetty-samples/example-webdefault.xml $JETTY_HOME/etc
 
 # restart exist
 #/etc/rc.d/exist restart

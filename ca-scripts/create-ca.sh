@@ -236,6 +236,9 @@ if [ $err -ne 0 ]; then
     exit 2
 fi
 
+# copy generated CA cert to .cacert suffix, mime type for browser import
+cp $EASYRSA_PKI/ca.crt $EASYRSA_PKI/ca.cacert
+
 ### create server cert for eXist webserver
 
 # server cert data
