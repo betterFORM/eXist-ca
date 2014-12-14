@@ -56,7 +56,7 @@ let $cert-tmp := $existca:ca-home || '/pki/' || $data/@name || '.xml'
 (: 
  : prepare options for calling external ca-scripts via shell
  :)
-let $options :=
+let $create-ca-options :=
    <options>
        <workingDir>{$ca-home}</workingDir>
        <environment>
@@ -85,13 +85,15 @@ let $options :=
            <env name="EXISTCA_XMLOUT" value="{$cert-tmp}"/>
            <env name="EXISTCA_HOME" value="{$ca-home}"/>
            <env name="PKI_BASE" value="{$ca-home || '/pki'}"/>
+
+	   <!-- next two only for reconfig-jetty, will go away here -->
            <env name="JETTY_HOME" value="{$existca:jetty-home}"/>
            <env name="JAVA_HOME" value="{environment-variable("JAVA_HOME")}"/>
            
        </environment>
    </options>
  
-let $result := (process:execute(("sh", "create-ca.sh"), $options))
+let $result := (process:execute(("sh", "create-ca.sh"), $create-ca-options))
 
 let $generated-cert-file:=file:read($cert-tmp)
 
@@ -114,5 +116,28 @@ return $result
 let $resourceName := data($uuid) || ".xml"
 let $stored :=  xmldb:store($cert-data-collection, $resourceName, $data)
 return $data
+
+:)
+
+(: EXPERIMENTAL: factor out reconfig-hetty.sh from create-ca.sh :)
+
+(: 
+ : prepare options for calling external ca-scripts/reconfig-jetty.sh via shell
+ :)
+(: NOTE "???" below
+let $reonf-jetty-options :=
+   <options>
+       <workingDir>{$ca-home}</workingDir>
+       <environment>
+	   <!-- SERVER_P12=${PKI_BASE}/${THIS_CA}/private/${THIS_SRV}.p12 -->
+           <env name="SERVER_P12" value="???"/>
+           <env name="JAVA_HOME" value="{environment-variable("JAVA_HOME")}"/>
+           <env name="JETTY_HOME" value="{$existca:jetty-home}"/>
+           <env name="EXISTCA_HOME" value="{$ca-home}"/>
+           <env name="EXISTCA_SRVPASS" value="{$data/capass}"/>
+       </environment>
+   </options>
+ 
+let $result := (process:execute(("sh", "reconfig-jetty.sh"), $reonf-jetty-options))
 
 :)
