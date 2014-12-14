@@ -45,10 +45,11 @@ USE_PW=$DEFPW
 #$FAKE $JAVA_HOME/bin/keytool -storepasswd -new "$USE_PW" -storepass "$DEFPW" -keystore $JETTY_KEYSTORE
 
 # import PKCS12 into keystore
-#$FAKE $JAVA_HOME/bin/keytool -importkeystore -srckeystore $SERVER_P12 -srcstoretype PKCS12 -destkeystore $JETTY_KEYSTORE -srcalias 1 -destalias jetty -deststorepass "$USE_PW" -srcstorepass "$EXISTCA_EXPORTPASS"
-$FAKE $JAVA_HOME/bin/keytool -importkeystore -srckeystore $SERVER_P12 -srcstoretype PKCS12 -destkeystore $JETTY_KEYSTORE -srcalias 1 -destalias jetty -deststorepass "$USE_PW" -srcstorepass "$EXISTCA_SRVPASS"
+$FAKE $JAVA_HOME/bin/keytool -importkeystore -srckeystore $SERVER_P12 -srcstoretype PKCS12 -destkeystore $JETTY_KEYSTORE -srcalias 1 -destalias jetty -deststorepass "$USE_PW" -srcstorepass "$EXISTCA_EXPORTPASS"
+#$FAKE $JAVA_HOME/bin/keytool -importkeystore -srckeystore $SERVER_P12 -srcstoretype PKCS12 -destkeystore $JETTY_KEYSTORE -srcalias 1 -destalias jetty -deststorepass "$USE_PW" -srcstorepass "$EXISTCA_SRVPASS"
+
 # also import CA cert explicitly, avoids complaints from jetty
-$FAKE $JAVA_HOME/bin/keytool -import -alias $THIS_CA -file $CA_CERT -keystore $JETTY_KEYSTORE -storepass "$USE_PW" -noprompt
+#$FAKE $JAVA_HOME/bin/keytool -import -alias $THIS_CA -file $CA_CERT -keystore $JETTY_KEYSTORE -storepass "$USE_PW" -noprompt
 
 # rewrite jetty.xml file
 cd ${JETTY_HOME}/etc && cp jetty.xml jetty.xml.bak \
