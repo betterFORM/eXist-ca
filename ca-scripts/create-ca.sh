@@ -296,7 +296,6 @@ dump_xml
 # err out with exit code 3 (server cert)
 if [ $err -ne 0 ]; then
     logmsg "ERROR creating CA \"$THIS_CA\": server cert"
-    dump_xml
     exit 3
 fi
 
