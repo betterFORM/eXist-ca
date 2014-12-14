@@ -84,7 +84,6 @@ fi
 
 # dump CA and server data as XML
 dump_xml () {
-    #XML_OUT=${JETTY_HOME}/tmp/${THIS_CA}.xml
     ca_crt=`cat $EASYRSA_PKI/ca.crt`
     ca_key=`cat $EASYRSA_PKI/private/ca.key`
     srv_crt=`cat $EASYRSA_PKI/issued/${THIS_SRV}.crt`
@@ -312,15 +311,6 @@ if [ $? -ne 0 ]; then
     # err out with exit code 4 (jetty reconfig)
     exit 4
 fi
-
-### check/fix hostname/network config to match web server name
-
-#$FAKE sh $EXISTCA_HOME/reconfig-net.sh
-#if [ $? -ne 0 ]; then
-#    logmsg "ERROR \"$THIS_CA\" - failed to reconfig network"
-#    # err out with exit code 5 (network reconfig)
-#    exit 5
-#fi
 
 
 exit 0

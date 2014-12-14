@@ -3,15 +3,12 @@
 # required env vars as documented above
 export REQ_ENV="\
  SERVER_P12 \
- CA_CERT \
- THIS_CA \
  JAVA_HOME \
  JETTY_HOME \
- EXISTCA_SRVPASS \
  EXISTCA_HOME \
- PKI_BASE
+ EXISTCA_SRVPASS \
+ EXISTCA_EXPORTPASS
 "
-# EXISTCA_EXPORTPASS \
 
 #FAKE=echo
 
@@ -49,6 +46,7 @@ $FAKE $JAVA_HOME/bin/keytool -importkeystore -srckeystore $SERVER_P12 -srcstoret
 #$FAKE $JAVA_HOME/bin/keytool -importkeystore -srckeystore $SERVER_P12 -srcstoretype PKCS12 -destkeystore $JETTY_KEYSTORE -srcalias 1 -destalias jetty -deststorepass "$USE_PW" -srcstorepass "$EXISTCA_SRVPASS"
 
 # also import CA cert explicitly, avoids complaints from jetty
+# XXX probably not needed.  expects CA_CERT and THIS_CA env vars
 #$FAKE $JAVA_HOME/bin/keytool -import -alias $THIS_CA -file $CA_CERT -keystore $JETTY_KEYSTORE -storepass "$USE_PW" -noprompt
 
 # rewrite jetty.xml file
@@ -62,6 +60,15 @@ cp $JETTY_XML_SRC $JETTY_HOME/etc
 # patch webdefaults.xml to support cert mime types
 # XXX work in progress, for now we copy our sample file
 cp $EXISTCA_HOME/jetty-samples/example-webdefault.xml $JETTY_HOME/etc
+
+# check/fix hostname/network config to match web server name
+
+#$FAKE sh $EXISTCA_HOME/reconfig-net.sh
+#if [ $? -ne 0 ]; then
+#    logmsg "ERROR - failed to reconfig network"
+#    # err out with exit code 5 (network reconfig)
+#    exit 5
+#fi
 
 # restart exist
 #/etc/rc.d/exist restart
