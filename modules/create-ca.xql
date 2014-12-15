@@ -9,10 +9,11 @@ let $home := system:get-exist-home()
 :)
 
 let $ca-home := $existca:ca-home
+let $ca-uuid := util:uuid()
 let $cert-data-collection := $existca:cert-data-collection
 
 (:let $data := request:get-data():)
-let $data := <CA name="myname" nicename="" servername="example.org">
+let $data := <CA name="" nicename="my name" servername="ca.example.org">
             <keysize>4096</keysize>
             <expire>1825</expire>
             <capass>aaa</capass>
@@ -52,7 +53,7 @@ let $data := <CA name="myname" nicename="" servername="example.org">
             </rejected-requests>
         </CA>
 
-let $cert-tmp := $existca:ca-home || '/pki/' || $data/@name || '.xml'
+let $cert-tmp := $existca:ca-home || '/pki/' || $ca-uuid || '.xml'
 (: 
  : prepare options for calling external ca-scripts via shell
  :)
@@ -99,8 +100,7 @@ let $result := (process:execute(("sh", "create-ca.sh"), $create-ca-options))
 let $generated-cert-file:=file:read($cert-tmp)
 
 let $foo := if($result/@exitCode=0) then
-        let $uuid := util:uuid()
-        let $resourceName := $data/@name || ".xml"
+        let $resourceName := $ca-uuid || ".xml"
         return xmldb:store($cert-data-collection, $resourceName, $generated-cert-file)
 else ()
      
