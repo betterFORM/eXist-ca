@@ -86,8 +86,9 @@ let $create-ca-options :=
            <env name="EXISTCA_HOME" value="{$ca-home}"/>
            <env name="PKI_BASE" value="{$ca-home || '/pki'}"/>
 
-	   <!-- next two only for reconfig-jetty, will go away here -->
+	   <!-- next three only for reconfig-jetty, will go away here -->
            <env name="JETTY_HOME" value="{$existca:jetty-home}"/>
+           <env name="JETTY_PORT" value="{environment-variable("JETTY_PORT")}"/>
            <env name="JAVA_HOME" value="{environment-variable("JAVA_HOME")}"/>
            
        </environment>
@@ -133,6 +134,7 @@ let $reonf-jetty-options :=
            <env name="SERVER_P12" value="???"/>
            <env name="JAVA_HOME" value="{environment-variable("JAVA_HOME")}"/>
            <env name="JETTY_HOME" value="{$existca:jetty-home}"/>
+           <env name="JETTY_PORT" value="{environment-variable("JETTY_PORT")}"/>
            <env name="EXISTCA_HOME" value="{$ca-home}"/>
            <env name="EXISTCA_SRVPASS" value="{$data/capass}"/>
        </environment>
