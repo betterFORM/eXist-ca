@@ -30,7 +30,8 @@
 #   EXISTCA_SRVOU        (eg "CA")
 #   EXISTCA_SRVEMAIL     (eg "ca@example.org")
 #   EXISTCA_HOME        (eg /usr/local/eXistCA)
-#   EXISTCA XMLOUT      
+#   EXISTCA EXPORTPASS
+#   EXISTCA XMLOUT
 #   PKI_BASE
 #
 # This script returns the following exit codes:
@@ -65,6 +66,7 @@ REQ_ENV="\
  EXISTCA_SRVOU \
  EXISTCA_SRVEMAIL \
  EXISTCA_HOME \
+ EXISTCA_EXPORTPASS \
  EXISTCA_XMLOUT \
  PKI_BASE \
 "
