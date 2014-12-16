@@ -390,6 +390,10 @@
     <extension>cacert</extension>
     <mime-type>application/x-x509-ca-cert</mime-type>
   </mime-mapping>
+  <mime-mapping>
+    <extension>p12</extension>
+    <mime-type>application/x-pkcs12</mime-type>
+  </mime-mapping>
 
   <!-- ==================================================================== -->
   <welcome-file-list>
