@@ -53,6 +53,13 @@ if [ ! -f "$SERVER_P12" ]; then
     exit 1
 fi
 
+# verify jetty port value is postive integer
+if ! verify_posint $JETTY_PORT; then
+    logmsg "ERROR - invalid $JETTY_PORT"
+    exit 1
+fi
+
+
 ### setup jetty keystore
 
 JETTY_KEYSTORE=${JETTY_HOME}/etc/keystore
