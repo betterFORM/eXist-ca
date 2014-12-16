@@ -32,8 +32,8 @@ verify_rsakeysize () {
     esac
 }
 
-# verify expire is a positive integer
-verify_expire () {
+# verify that arg is a positive integer
+verify_posint () {
     [[ $1 -gt 0 ]] || ( logmsg "expire not positive int $1"; return 1 )
 }
 
