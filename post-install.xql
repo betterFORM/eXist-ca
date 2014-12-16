@@ -2,6 +2,7 @@ xquery version "3.0";
 
 declare namespace file="http://exist-db.org/xquery/file";
 declare namespace util="http://exist-db.org/xquery/util";
+declare namespace xmldb="http://exist-db.org/xquery/xmldb";
 import module namespace existca="http://exist-db.org/apps/existCA" at "modules/ca-config.xqm";
 
 (: creates root directory for ca-scripts and easyRSA scripts and
@@ -21,7 +22,9 @@ declare function local:init() {
     :)
     let $sync := file:sync("/db/apps/eXistCA/ca-scripts",$ca-scripts,())
     let $easyrsa := file:sync("/db/apps/eXistCA/resources/easyrsa3",$ca-scripts || "/easyrsa",())
-    return $sync
+    
+    let $fake := xmldb:create-collection("/db/apps/eXistCA/data","ca")
+    return ()
 };
 
 local:init()
