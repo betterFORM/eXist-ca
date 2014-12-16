@@ -9,6 +9,7 @@ let $home := system:get-exist-home()
 :)
 
 let $ca-home := $existca:ca-home
+let $pki-home := $ca-home || '/pki'
 let $ca-uuid := util:uuid()
 let $cert-data-collection := $existca:cert-data-collection
 
@@ -53,7 +54,9 @@ let $data := <CA name="" nicename="my name" servername="ca.example.org">
             </rejected-requests>
         </CA>
 
-let $cert-tmp := $existca:ca-home || '/pki/' || $ca-uuid || '.xml'
+(: let $cert-tmp := $existca:ca-home || '/pki/' || $ca-uuid || '.xml' :)
+let $cert-tmp := $pki-home || '/' || $ca-uuid || '.xml'
+
 (: 
  : prepare options for calling external ca-scripts via shell
  :)
@@ -71,7 +74,11 @@ let $create-ca-options :=
            <env name="EXISTCA_CAORG" value="{$data/org}"/>
            <env name="EXISTCA_CAOU" value="{$data/org-unit}"/>
            <env name="EXISTCA_CAEMAIL" value="{$data/email}"/>
+           <env name="EXISTCA_XMLOUT" value="{$cert-tmp}"/>
+           <env name="EXISTCA_HOME" value="{$ca-home}"/>
+           <env name="PKI_BASE" value="{$pki-home'}"/>
 
+	   <!-- next ten only for create-casrvcert, will go away here -->
            <env name="EXISTCA_SRVNAME" value="{$data/@servername}"/>
            <env name="EXISTCA_SRVPASS" value="{$data/capass}"/>
            <env name="EXISTCA_SRVKEYSIZE" value="{$data/keysize}"/>
@@ -82,10 +89,6 @@ let $create-ca-options :=
            <env name="EXISTCA_SRVORG" value="{$data/org}"/>
            <env name="EXISTCA_SRVOU" value="{$data/org-unit}"/>
            <env name="EXISTCA_SRVEMAIL" value="{$data/email}"/>
-
-           <env name="EXISTCA_XMLOUT" value="{$cert-tmp}"/>
-           <env name="EXISTCA_HOME" value="{$ca-home}"/>
-           <env name="PKI_BASE" value="{$ca-home || '/pki'}"/>
 
 	   <!-- next three only for reconfig-jetty, will go away here -->
            <env name="JETTY_HOME" value="{$existca:jetty-home}"/>
@@ -123,23 +126,54 @@ return $data
 (: EXPERIMENTAL: factor out reconfig-hetty.sh from create-ca.sh :)
 
 (: 
- : prepare options for calling external ca-scripts/reconfig-jetty.sh via shell
+ : prepare options for calling external ca-scripts/create-casrvcert.sh via shell
  :)
-(: NOTE "???" below
-let $reonf-jetty-options :=
+(: 
+let $create-casrvcert-options :=
    <options>
        <workingDir>{$ca-home}</workingDir>
        <environment>
-	   <!-- SERVER_P12=${PKI_BASE}/${THIS_CA}/private/${THIS_SRV}.p12 -->
-           <env name="SERVER_P12" value="???"/>
+           <env name="EXISTCA_CAPASS" value="{$data/capass}"/>
+           <env name="EXISTCA_CANAME" value="{$data/@name}"/>
+           <env name="EXISTCA_CERTNAME" value="{$data/@servername}"/>
+           <env name="EXISTCA_CERTPASS" value="{$data/capass}"/>
+           <env name="EXISTCA_CERTTYPE" value="server"/>
+           <env name="EXISTCA_CERTKEYSIZE" value="{$data/keysize}"/>
+           <env name="EXISTCA_CERTEXPIRE" value="{$data/expire}"/>
+           <env name="EXISTCA_CERTCOUNTRY" value="{$data/country}"/>
+           <env name="EXISTCA_CERTPROVINCE" value="{$data/province}"/>
+           <env name="EXISTCA_CERTCITY" value="{$data/city}"/>
+           <env name="EXISTCA_CERTORG" value="{$data/org}"/>
+           <env name="EXISTCA_CERTOU" value="{$data/org-unit}"/>
+           <env name="EXISTCA_CERTEMAIL" value="{$data/email}"/>
+           <env name="EXISTCA_HOME" value="{$ca-home}"/>
+           <env name="EXISTCA_XMLOUT" value="{$cert-tmp}"/>
+           <env name="PKI_BASE" value="{$pki-home}"/>
+       </environment>
+   </options>
+
+let $result := (process:execute(("sh", "create-casrvcert.sh"), $create-casrvcert-options))
+
+:)
+
+(: 
+ : prepare options for calling external ca-scripts/reconfig-jetty.sh via shell
+ :)
+(: 
+let $srv-p12-file := $pki-home || '/' || $data/@name || 'private' || $data/@servername || '.p12'
+let $reconf-jetty-options :=
+   <options>
+       <workingDir>{$ca-home}</workingDir>
+       <environment>
+           <env name="SERVER_P12" value="{$srv-p12-file}"/>
            <env name="JAVA_HOME" value="{environment-variable("JAVA_HOME")}"/>
            <env name="JETTY_HOME" value="{$existca:jetty-home}"/>
            <env name="JETTY_PORT" value="{environment-variable("JETTY_PORT")}"/>
            <env name="EXISTCA_HOME" value="{$ca-home}"/>
-           <env name="EXISTCA_SRVPASS" value="{$data/capass}"/>
+           <env name="EXISTCA_CERTPASS" value="{$data/capass}"/>
        </environment>
    </options>
  
-let $result := (process:execute(("sh", "reconfig-jetty.sh"), $reonf-jetty-options))
+let $result := (process:execute(("sh", "reconfig-jetty.sh"), $reconf-jetty-options))
 
 :)
