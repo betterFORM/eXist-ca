@@ -127,7 +127,7 @@ else
     genreq_opt=nopass
 fi
 EXISTCA_AUTHIN=
-$FAKE sh ./easyrsa gen-req "$EASYRSA_REQ_CN" $genreq_opt
+$FAKE sh ./easyrsa gen-req "$THIS_CN" $genreq_opt
 if [ $? -ne 0 ]; then
     logmsg "ERROR \"$THIS_CA\" - failed to generate certificate request"
     err=1
