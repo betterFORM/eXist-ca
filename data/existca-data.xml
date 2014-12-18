@@ -27,6 +27,8 @@ Sample data
             <certs>
                 <cert name="" nicename="">
                     <certtype/>
+		    <keysize/>
+		    <expire/>
                     <status/>
                     <expire-timestamp/>
                     <serial/>
