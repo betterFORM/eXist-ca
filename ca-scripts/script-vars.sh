@@ -34,7 +34,17 @@ verify_rsakeysize () {
 
 # verify that arg is a positive integer
 verify_posint () {
-    [[ $1 -gt 0 ]] || ( logmsg "expire not positive int $1"; return 1 )
+    i=$1
+    [[ $i -gt 0 ]] || ( logmsg "expire not positive int $i"; return 1 )
+}
+
+# verify cert type
+verify_certtype () {
+    t=$1
+    case "$t" in
+	server|client) ;;
+	*) logmsg "unsupported certificate type $t"; return 1;;
+    esac
 }
 
 
