@@ -1,7 +1,6 @@
 #!/bin/sh 
 
-# create a web server certificate for eXist itself in one go (req,sign,pkcs12)
-# this functionality used to be in create-ca.sh before
+# create a certiificate in one go (req,sign,pkcs12)
 #
 # The following environment vars need to be passed from the caller 
 # (vars may have no value, but must be present in the environment):
@@ -50,36 +49,26 @@ REQ_ENV="\
 "
 
 #FAKE="echo"
-#DEBUG=1
-if [ -n "$DEBUG" ]; then
-    echo -n "cmdline: "
-    echo $*
-    echo -n "pwd: "
-    pwd
-    echo "environment:"
-    env
-    echo "stdin:"
-    while read line; do echo $line; done
-fi
 
-# dump server data as XML
+# dump cert data as XML
 dump_xml () {
-    srv_crt=`cat $EASYRSA_PKI/issued/${THIS_SRV}.crt`
-    srv_key=`cat $EASYRSA_PKI/private/${THIS_SRV}.key`
-    #srv_pkcs12=`cat $EASYRSA_PKI/private/${THIS_SRV}.p12`
+    srv_crt=`cat $EASYRSA_PKI/issued/${THIS_CN}.crt`
+    srv_key=`cat $EASYRSA_PKI/private/${THIS_CN}.key`
+    #srv_pkcs12=`cat $EASYRSA_PKI/private/${THIS_CN}.p12`
     srv_pkcs12='this is binary and needs encoding'
-    srv_req=`cat $EASYRSA_PKI/reqs/${THIS_SRV}.req`
+    srv_req=`cat $EASYRSA_PKI/reqs/${THIS_CN}.req`
     ca_serial=`tr -dc "[:xdigit:]" <$EASYRSA_PKI/serial`
     read status expire serial unkn cn <<INDEX
-$(grep "$THIS_SRV" $EASYRSA_PKI/index.txt)
+$(grep "$THIS_CN" $EASYRSA_PKI/index.txt)
 INDEX
-#    exp_date=`openssl x509 -text -in $EASYRSA_PKI/issued/${THIS_SRV}.crt | grep "Not After" | sed 's/.*Not After : //;`
+    exp_date=`openssl x509 -text -in $EASYRSA_PKI/issued/${THIS_CN}.crt | grep "Not After" | sed 's/.*Not After : //;'`
     printf "
-<cert name=\"$THIS_SRV\" nicename=\"$EXISTCA_CERTNAME\">
-  <certtype>server</certtype>
-  <serial>$serial</serial>
+<cert name=\"$THIS_CN\" nicename=\"$EXISTCA_CERTNAME\">
+  <certtype>$EXISTCA_CERTTYPE</certtype>
   <status>$status</status>
   <expire-timestamp>$expire</expire-timestamp>
+  <serial>$serial</serial>
+  <expiry-date>$exp_date</expiry-date>
   <certpass>$EXISTCA_CERTPASS</certpass>
   <country>$EXISTCA_CERTCOUNTRY</country>
   <province>$EXISTCA_CERTPROVINCE</province>
@@ -108,26 +97,31 @@ fi
 
 ### validate user provided input data
 
-# verify keysize user input
-if ! verify_rsakeysize $EXISTCA_CERTKEYSIZE; then
-    logmsg "ERROR - key size $EXISTCA_CERTKEYSIZE not supported"
-    err=1
-fi
-# verify expire value is postive integer
-if ! verify_posint $EXISTCA_CERTEXPIRE; then
-    logmsg "ERROR - invalid $EXISTCA_CERTEXPIRE data"
-    err=1
-fi
-
 # cleanup obscure chars out of passed CA name, for use as file name
 THIS_CA=`echo -n "$EXISTCA_CANAME" | tr -cd '[:alnum:]'`
 
 # cleanup obscure chars out of passed Common Name, for use as file name
-THIS_SRV=`echo -n "$EXISTCA_CERTNAME" | tr -cd '[:alnum:].-'`
+THIS_CN=`echo -n "$EXISTCA_CERTNAME" | tr -cd '[:alnum:].-'`
+
+# verify keysize user input
+if ! verify_rsakeysize $EXISTCA_CERTKEYSIZE; then
+    logmsg "ERROR \"$THIS_CA\" - key size $EXISTCA_CERTKEYSIZE not supported"
+    err=1
+fi
+# verify expire value is postive integer
+if ! verify_posint $EXISTCA_CERTEXPIRE; then
+    logmsg "ERROR \"$THIS_CA\" - invalid $EXISTCA_CERTEXPIRE data"
+    err=1
+fi
+# verify cert type input data
+if ! verify_certtype $EXISTCA_CERTTYPE; then
+    logmsg "ERROR \"$THIS_CA\" - invalid $EXISTCA_CERTTYPE data"
+    err=1
+fi
 
 # err out with exit code 1 (parameter problem)
 if [ $err -ne 0 ]; then
-    logmsg "ERROR creating web server cert: parameter problem"
+    logmsg "ERROR \"$THIS_CA\" - creating $EXISTCA_CERTTYPE certificate: parameter problem"
     printf "<cert/>"
     exit 1
 fi
@@ -140,7 +134,7 @@ export EASYRSA_PKI=${PKI_BASE}/${THIS_CA}
 
 export EASYRSA_KEY_SIZE=$EXISTCA_CERTKEYSIZE
 export EASYRSA_CERT_EXPIRE=$EXISTCA_CERTEXPIRE
-export EASYRSA_REQ_CN=$THIS_SRV
+export EASYRSA_REQ_CN=$THIS_CN
 export EASYRSA_REQ_COUNTRY=$EXISTCA_CERTCOUNTRY
 export EASYRSA_REQ_PROVINCE=$EXISTCA_CERTPROVINCE
 export EASYRSA_REQ_CITY=$EXISTCA_CERTCITY
@@ -157,7 +151,7 @@ export EXISTCA_CAPASS EXISTCA_CERTPASS EXISTCA_EXPORTPASS
 
 cd $EASYRSA
 
-# create web server cert request
+# create cert request
 if [ -n "$EXISTCA_CERTPASS" ]; then
     EXISTCA_AUTHOUT="env:EXISTCA_CERTPASS"
 else
@@ -167,16 +161,16 @@ fi
 EXISTCA_AUTHIN=
 $FAKE sh ./easyrsa gen-req "$EASYRSA_REQ_CN" $genreq_opt
 if [ $? -ne 0 ]; then
-    logmsg "ERROR \"$THIS_CA\" - failed to generate web server certificate request"
+    logmsg "ERROR \"$THIS_CA\" - failed to generate certificate request"
     err=1
 fi
 
-# sign web server cert request
+# sign cert request
 EXISTCA_AUTHIN="env:EXISTCA_CAPASS"
 EXISTCA_AUTHOUT=
-$FAKE sh ./easyrsa sign-req server "$EASYRSA_REQ_CN"
+$FAKE sh ./easyrsa sign-req "$EXISTCA_CERTTYPE" "$EASYRSA_REQ_CN"
 if [ $? -ne 0 ]; then
-    logmsg "ERROR \"$THIS_CA\" - failed to sign web server certificate"
+    logmsg "ERROR \"$THIS_CA\" - failed to sign $EXISTCA_CERTTYPE certificate"
     err=1
 fi
 
@@ -191,7 +185,7 @@ else
 fi
 $FAKE sh ./easyrsa export-p12 "$EASYRSA_REQ_CN"
 if [ $? -ne 0 ]; then
-    logmsg "ERROR \"$THIS_CA\" - failed to pkcs12 export web server certificate"
+    logmsg "ERROR \"$THIS_CA\" - failed to pkcs12 export $EXISTCA_CERTTYPE certificate"
     err=1
 fi
 
@@ -199,9 +193,9 @@ fi
 # dump XML data to stdout regardless of possible errors
 dump_xml
 
-# err out with exit code 3 (server cert)
+# err out with exit code 2
 if [ $err -ne 0 ]; then
-    logmsg "ERROR \"$THIS_CA\" - failed to create web server certificate"
+    logmsg "ERROR \"$THIS_CA\" - failed to create $EXISTCA_CERTTYPE certificate"
     exit 2
 fi
 
