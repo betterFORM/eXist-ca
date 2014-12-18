@@ -42,25 +42,34 @@ export REQ_ENV="\
 "
 
 #FAKE="echo"
-#DEBUG=1
-if [ -n "$DEBUG" ]; then
-    echo -n "cmdline: "
-    echo $*
-    echo -n "pwd: "
-    pwd
-    echo "environment:"
-    env
-    echo "stdin:"
-    while read line; do echo $line; done
-fi
 
-# dump server data as XML
-#dump_xml () {
-#    printf "
-#<cert>
-#</cert>
-#" >$EXISTCA_XMLOUT
-#}
+# dump cert request data as XML
+dump_xml () {
+    srv_key=`cat $EASYRSA_PKI/private/${THIS_CN}.key`
+    srv_req=`cat $EASYRSA_PKI/reqs/${THIS_CN}.req`
+    printf "
+<cert name=\"$THIS_CN\" nicename=\"$EXISTCA_CERTNAME\">
+  <certtype>$EXISTCA_CERTTYPE</certtype>
+  <keysize>$EXISTCA_CERTKEYSIZE</keysize>
+  <expire/>
+  <status/>
+  <expire-timestamp/>
+  <serial/>
+  <expiry-date/>
+  <certpass>$EXISTCA_CERTPASS</certpass>
+  <country>$EXISTCA_CERTCOUNTRY</country>
+  <province>$EXISTCA_CERTPROVINCE</province>
+  <city>$EXISTCA_CERTCITY</city>
+  <org>$EXISTCA_CERTORG</org>
+  <org-unit>$EXISTCA_CERTOU</org-unit>
+  <email>$EXISTCA_CERTEMAIL</email>
+  <cert/>
+  <key>$srv_key</key>
+  <pkcs12/>
+  <req>$srv_req</req>
+</cert>
+" >$EXISTCA_XMLOUT
+}
 
 # source common script vars
 . $EXISTCA_HOME/script-vars.sh
@@ -75,21 +84,21 @@ fi
 
 ### validate user provided input data
 
-# verify keysize user input
-if ! verify_rsakeysize $EXISTCA_CERTKEYSIZE; then
-    logmsg "ERROR - key size $EXISTCA_CERTKEYSIZE not supported"
-    err=1
-fi
-
 # cleanup obscure chars out of passed CA name, for use as file name
 THIS_CA=`echo -n "$EXISTCA_CANAME" | tr -cd '[:alnum:]'`
 
 # cleanup obscure chars out of passed Common Name, for use as file name
 THIS_CN=`echo -n "$EXISTCA_CERTNAME" | tr -cd '[:alnum:].-'`
 
+# verify keysize user input
+if ! verify_rsakeysize $EXISTCA_CERTKEYSIZE; then
+    logmsg "ERROR \"$THIS_CA\" - key size $EXISTCA_CERTKEYSIZE not supported"
+    err=1
+fi
+
 # err out with exit code 1 (parameter problem)
 if [ $err -ne 0 ]; then
-    logmsg "ERROR creating cert request: parameter problem"
+    logmsg "ERROR \"$THIS_CA\" - creating cert request: parameter problem"
     printf "<cert/>"
     exit 1
 fi
@@ -113,9 +122,7 @@ export EASYRSA_REQ_EMAIL=$EXISTCA_CERTEMAIL
 # reset and export auth related vars
 EXISTCA_AUTHIN=
 EXISTCA_AUTHOUT=
-EXISTCA_AUTHPASS=
-export EXISTCA_AUTHIN EXISTCA_AUTHOUT EXISTCA_AUTHPASS
-export EXISTCA_CAPASS EXISTCA_CERTPASS EXISTCA_EXPORTPASS
+export EXISTCA_AUTHIN EXISTCA_AUTHOUT EXISTCA_CERTPASS
 
 cd $EASYRSA
 
@@ -135,7 +142,7 @@ fi
 
 
 # dump XML data to stdout regardless of possible errors
-#dump_xml
+dump_xml
 
 # err out with exit code 3 (server cert)
 if [ $err -ne 0 ]; then

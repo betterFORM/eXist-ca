@@ -30,21 +30,28 @@ REQ_ENV="\
 "
 
 #FAKE="echo"
-#DEBUG=1
-if [ -n "$DEBUG" ]; then
-    echo -n "cmdline: "
-    echo $*
-    echo -n "pwd: "
-    pwd
-    echo "environment:"
-    env
-    echo "stdin:"
-    while read line; do echo $line; done
-fi
 
-# dump server data as XML
+# dump cert data as XML
 dump_xml () {
+    srv_crt=`cat $EASYRSA_PKI/issued/${THIS_CN}.crt`
+    #srv_pkcs12=`cat $EASYRSA_PKI/private/${THIS_CN}.p12`
+    srv_pkcs12='this is binary and needs encoding'
+    read status expire serial unkn cn <<INDEX
+$(grep "$THIS_CN" $EASYRSA_PKI/index.txt)
+INDEX
+    exp_date=`openssl x509 -text -in $EASYRSA_PKI/issued/${THIS_CN}.crt | grep "Not After" | sed 's/.*Not After : //;'`
+    # note this return only XML elements that must be updated
     printf "
+<cert name=\"$THIS_CN\" nicename=\"$EXISTCA_CERTNAME\">
+  <certtype>$EXISTCA_CERTTYPE</certtype>
+  <expire>$EXISTCA_CERTEXPIRE</expire>
+  <status>$status</status>
+  <expire-timestamp>$expire</expire-timestamp>
+  <serial>$serial</serial>
+  <expiry-date>$exp_date</expiry-date>
+  <cert>$srv_crt</cert>
+  <pkcs12>$srv_pkcs12</pkcs12>
+</cert>
 " >$EXISTCA_XMLOUT
 }
 
@@ -61,21 +68,26 @@ fi
 
 ### validate all user provided input data
 
-# verify expire value is postive integer
-if ! verify_posint $EXISTCA_CERTEXPIRE; then
-    logmsg "ERROR - invalid $EXISTCA_CERTEXPIRE data"
-    err=1
-fi
-
 # cleanup obscure chars out of passed CA name, for use as file name
 THIS_CA=`echo -n "$EXISTCA_CANAME" | tr -cd '[:alnum:]'`
 
 # cleanup obscure chars out of passed Common Name, for use as file name
 THIS_CN=`echo -n "$EXISTCA_CERTNAME" | tr -cd '[:alnum:].-'`
 
+# verify expire value is postive integer
+if ! verify_posint $EXISTCA_CERTEXPIRE; then
+    logmsg "ERROR \"$THIS_CA\" - invalid $EXISTCA_CERTEXPIRE data"
+    err=1
+fi
+# verify cert type input data
+if ! verify_certtype $EXISTCA_CERTTYPE; then
+    logmsg "ERROR \"$THIS_CA\" - invalid $EXISTCA_CERTTYPE data"
+    err=1
+fi
+
 # err out with exit code 1 (parameter problem)
 if [ $err -ne 0 ]; then
-    logmsg "ERROR creating web server cert: parameter problem"
+    logmsg "ERROR \"$THIS_CA\" - creating $EXISTCA_CERTTYPE cert: parameter problem"
     printf "<cert/>"
     exit 1
 fi
@@ -87,7 +99,7 @@ fi
 export EASYRSA_PKI=${PKI_BASE}/${THIS_CA}
 
 export EASYRSA_CERT_EXPIRE=$EXISTCA_CERTEXPIRE
-export EASYRSA_REQ_CN=$EXISTCA_CERTNAME
+export EASYRSA_REQ_CN=$THIS_CN
 
 EXISTCA_AUTHIN=
 EXISTCA_AUTHOUT=
@@ -102,7 +114,7 @@ EXISTCA_AUTHIN="env:EXISTCA_CAPASS"
 EXISTCA_AUTHOUT=
 $FAKE ./easyrsa sign-req "$EXISTCA_CERTTYPE" "$THIS_CN"
 if [ $? -ne 0 ]; then
-    logmsg "ERROR - failed to sign $EXISTCA_CERTTYPE certificate"
+    logmsg "ERROR \"$THIS_CA\" - failed to sign $EXISTCA_CERTTYPE certificate"
     err=1
 fi
 
@@ -117,17 +129,17 @@ else
 fi
 $FAKE ./easyrsa export-p12 "$THIS_CN"
 if [ $? -ne 0 ]; then
-    logmsg "failed to export certificate to PKCS#12 format"
+    logmsg "ERROR \"$THIS_CA\" - failed to export certificate to PKCS#12 format"
     err=1
 fi
 
 
 # dump XML data to stdout regardless of possible errors
-#dump_xml
+dump_xml
 
 # err out with exit code 2 (sign cert)
 if [ $err -ne 0 ]; then
-    logmsg "ERROR signing $EXISTCA_CERTTYPE certificate request"
+    logmsg "ERROR \"$THIS_CA\" - signing $EXISTCA_CERTTYPE certificate request"
     exit 2
 fi
 
