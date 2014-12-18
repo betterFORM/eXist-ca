@@ -19,18 +19,7 @@
 #   EXISTCA_CAORG       (eg "Example Org")
 #   EXISTCA_CAOU        (eg "CA")
 #   EXISTCA_CAEMAIL     (eg "ca@example.org")
-#   EXISTCA_SRVNAME     (eg "existca.example.org")
-#   EXISTCA_SRVKEYSIZE  (eg 2048)
-#   EXISTCA_SRVEXPIRE   (eg 1825)
-#   EXISTCA_SRVPASS     (eg "secret")
-#   EXISTCA_SRVCOUNTRY   (eg "DE")
-#   EXISTCA_SRVPROVINCE  (eg "Berlin")
-#   EXISTCA_SRVCITY      (eg "Berlin")
-#   EXISTCA_SRVORG       (eg "Example Org")
-#   EXISTCA_SRVOU        (eg "CA")
-#   EXISTCA_SRVEMAIL     (eg "ca@example.org")
 #   EXISTCA_HOME        (eg /usr/local/eXistCA)
-#   EXISTCA EXPORTPASS
 #   EXISTCA XMLOUT
 #   PKI_BASE
 #
@@ -38,9 +27,6 @@
 #   0  - success
 #   1  - fail: parameter problem
 #   2  - fail: CA init
-#   3  - fail: server cert
-#   4  - fail: jetty reconfig
-#   5  - fail: network reconfig
 
 
 # required env vars as documented above
@@ -55,51 +41,21 @@ REQ_ENV="\
  EXISTCA_CAORG \
  EXISTCA_CAOU \
  EXISTCA_CAEMAIL \
- EXISTCA_SRVNAME \
- EXISTCA_SRVKEYSIZE \
- EXISTCA_SRVEXPIRE \
- EXISTCA_SRVPASS \
- EXISTCA_SRVCOUNTRY \
- EXISTCA_SRVPROVINCE \
- EXISTCA_SRVCITY \
- EXISTCA_SRVORG \
- EXISTCA_SRVOU \
- EXISTCA_SRVEMAIL \
  EXISTCA_HOME \
- EXISTCA_EXPORTPASS \
  EXISTCA_XMLOUT \
  PKI_BASE \
 "
 
 #FAKE="echo"
-#DEBUG=1
-if [ -n "$DEBUG" ]; then
-    echo -n "cmdline: "
-    echo $*
-    echo -n "pwd: "
-    pwd
-    echo "environment:"
-    env
-    echo "stdin:"
-    while read line; do echo $line; done
-fi
 
 # dump CA and server data as XML
 dump_xml () {
     ca_crt=`cat $EASYRSA_PKI/ca.crt`
     ca_key=`cat $EASYRSA_PKI/private/ca.key`
-    srv_crt=`cat $EASYRSA_PKI/issued/${THIS_SRV}.crt`
-    srv_key=`cat $EASYRSA_PKI/private/${THIS_SRV}.key`
-    #srv_pkcs12=`cat $EASYRSA_PKI/private/${THIS_SRV}.p12`
-    srv_pkcs12='this is binary and needs encoding'
-    srv_req=`cat $EASYRSA_PKI/reqs/${THIS_SRV}.req`
     ca_serial=`tr -dc "[:xdigit:]" <$EASYRSA_PKI/serial`
-    read status expire serial unkn cn <<INDEX
-$(grep "$THIS_SRV" $EASYRSA_PKI/index.txt)
-INDEX
-#    exp_date=`openssl x509 -text -in $EASYRSA_PKI/issued/${THIS_SRV}.crt | grep "Not After" | sed 's/.*Not After : //;`
+    exp_date=`openssl x509 -text -in $EASYRSA_PKI/ca.crt | grep "Not After" | sed 's/.*Not After : //;'`
     printf "
-<CA name=\"$THIS_CA\" nicename=\"$EXISTCA_CANAME\" servername=\"$THIS_SRV\">
+<CA name=\"$THIS_CA\" nicename=\"$EXISTCA_CANAME\">
   <keysize>$EXISTCA_CAKEYSIZE</keysize>
   <expire>$EXISTCA_CAEXPIRE</expire>
   <capass>$EXISTCA_CAPASS</capass>
@@ -107,31 +63,14 @@ INDEX
   <cakey>$ca_key</cakey>
   <current-serial>$ca_serial</current-serial>
   <expiry-date>$exp_date</expiry-date>
+  <dnsname/>
   <country>$EXISTCA_CACOUNTRY</country>
   <province>$EXISTCA_CAPROVINCE</province>
   <city>$EXISTCA_CACITY</city>
   <org>$EXISTCA_CAORG</org>
   <org-unit>$EXISTCA_CAOU</org-unit>
   <email>$EXISTCA_CAEMAIL</email>
-  <certs>
-    <cert name=\"$THIS_SRV\" nicename=\"$EXISTCA_SRVNAME\">
-      <certtype>server</certtype>
-      <serial>$serial</serial>
-      <status>$status</status>
-      <expire-timestamp>$expire</expire-timestamp>
-      <certpass>$EXISTCA_SRVPASS</certpass>
-      <country>$EXISTCA_SRVCOUNTRY</country>
-      <province>$EXISTCA_SRVPROVINCE</province>
-      <city>$EXISTCA_SRVCITY</city>
-      <org>$EXISTCA_SRVORG</org>
-      <org-unit>$EXISTCA_SRVOU</org-unit>
-      <email>$EXISTCA_SRVEMAIL</email>
-      <cert>$srv_crt</cert>
-      <key>$srv_key</key>
-      <pkcs12>$srv_pkcs12</pkcs12>
-      <req>$srv_req</req>
-    </cert>
-  </certs>
+  <certs/>
 </CA>
 " >$EXISTCA_XMLOUT
 }
@@ -147,36 +86,25 @@ if ! checkenv $REQ_ENV; then
     err=1
 fi
 
-# validate user provided input data!
-
-# verify keysize user input
-if ! verify_rsakeysize $EXISTCA_CAKEYSIZE; then
-    logmsg "ERROR - key size $EXISTCA_CAKEYSIZE not supported"
-    err=1
-fi
-if ! verify_rsakeysize $EXISTCA_SRVKEYSIZE; then
-    logmsg "ERROR - key size $EXISTCA_SRVKEYSIZE not supported"
-    err=1
-fi
-# verify expire value is postive integer
-if ! verify_expire $EXISTCA_CAEXPIRE; then
-    logmsg "ERROR - invalid $EXISTCA_CAEXPIRE data"
-    err=1
-fi
-if ! verify_expire $EXISTCA_SRVEXPIRE; then
-    logmsg "ERROR - invalid $EXISTCA_SRVEXPIRE data"
-    err=1
-fi
+### validate user provided input data
 
 # cleanup obscure chars out of passed CA name, for use as file name
 THIS_CA=`echo -n "$EXISTCA_CANAME" | tr -cd '[:alnum:]'`
 
-# cleanup obscure chars out of passed server name, for use as file name
-THIS_SRV=`echo -n "$EXISTCA_SRVNAME" | tr -cd '[:alnum:].-'`
+# verify keysize user input
+if ! verify_rsakeysize $EXISTCA_CAKEYSIZE; then
+    logmsg "ERROR \"$THIS_CA\" - key size $EXISTCA_CAKEYSIZE not supported"
+    err=1
+fi
+# verify expire value is postive integer
+if ! verify_posint $EXISTCA_CAEXPIRE; then
+    logmsg "ERROR \"$THIS_CA\" - invalid $EXISTCA_CAEXPIRE data"
+    err=1
+fi
 
 # err out with exit code 1 (parameter problem)
 if [ $err -ne 0 ]; then
-    logmsg "ERROR creating CA \"$THIS_CA\": parameter problem"
+    logmsg "ERROR \"$THIS_CA\" - creating CA: parameter problem"
     printf "<CA/>"
     exit 1
 fi
@@ -200,9 +128,7 @@ export EASYRSA_REQ_EMAIL=$EXISTCA_CAEMAIL
 # reset and export auth related vars
 EXISTCA_AUTHIN=
 EXISTCA_AUTHOUT=
-EXISTCA_AUTHPASS=
-export EXISTCA_AUTHIN EXISTCA_AUTHOUT EXISTCA_AUTHPASS
-export EXISTCA_CAPASS EXISTCA_SRVPASS EXISTCA_EXPORTPASS
+export EXISTCA_AUTHIN EXISTCA_AUTHOUT EXISTCA_CAPASS
 
 cd $EASYRSA
 
@@ -240,78 +166,9 @@ fi
 # copy generated CA cert to .cacert suffix, mime type for browser import
 cp $EASYRSA_PKI/ca.crt $EASYRSA_PKI/ca.cacert
 
-### create server cert for eXist webserver
-
-# server cert data
-export EASYRSA_KEY_SIZE=$EXISTCA_SRVKEYSIZE
-export EASYRSA_CERT_EXPIRE=$EXISTCA_SRVEXPIRE
-export EASYRSA_REQ_CN=$THIS_SRV
-export EASYRSA_REQ_COUNTRY=$EXISTCA_SRVCOUNTRY
-export EASYRSA_REQ_PROVINCE=$EXISTCA_SRVPROVINCE
-export EASYRSA_REQ_CITY=$EXISTCA_SRVCITY
-export EASYRSA_REQ_ORG=$EXISTCA_SRVORG
-export EASYRSA_REQ_OU=$EXISTCA_SRVOU
-export EASYRSA_REQ_EMAIL=$EXISTCA_SRVEMAIL
-
-# create web server cert request
-if [ -n "$EXISTCA_SRVPASS" ]; then
-    EXISTCA_AUTHOUT="env:EXISTCA_SRVPASS"
-else
-    EXISTCA_AUTHOUT=
-    genreq_opt=nopass
-fi
-EXISTCA_AUTHIN=
-$FAKE sh ./easyrsa gen-req "$EASYRSA_REQ_CN" $genreq_opt
-if [ $? -ne 0 ]; then
-    logmsg "ERROR \"$THIS_CA\" - failed to generate web server certificate request"
-    err=1
-fi
-
-# sign web server cert request
-EXISTCA_AUTHIN="env:EXISTCA_CAPASS"
-EXISTCA_AUTHOUT=
-$FAKE sh ./easyrsa sign-req server "$EASYRSA_REQ_CN"
-if [ $? -ne 0 ]; then
-    logmsg "ERROR \"$THIS_CA\" - failed to sign web server certificate"
-    err=1
-fi
-
-# build PKCS12 cert data structure
-if [ -n "$EXISTCA_SRVPASS" ]; then
-    EXISTCA_AUTHIN="env:EXISTCA_SRVPASS"
-    #EXISTCA_AUTHPASS="env:EXISTCA_SRVPASS"
-    EXISTCA_AUTHPASS="env:EXISTCA_EXPORTPASS"
-else
-    EXISTCA_AUTHIN=
-    EXISTCA_AUTHPASS="env:EXISTCA_EXPORTPASS"
-fi
-$FAKE sh ./easyrsa export-p12 "$EASYRSA_REQ_CN"
-if [ $? -ne 0 ]; then
-    logmsg "ERROR \"$THIS_CA\" - failed to pkcs12 export web server certificate"
-    err=1
-fi
-
-### dump XML data to stdout regardless of possible errors (some XML fields 
-### may be left blank if server cert failed)
+# dump XML data to stdout regardless of possible errors (some XML fields 
+# may be left blank if server cert failed)
 dump_xml
-
-# err out with exit code 3 (server cert)
-if [ $err -ne 0 ]; then
-    logmsg "ERROR creating CA \"$THIS_CA\": server cert"
-    exit 3
-fi
-
-# install generated web server cert into eXist config
-export SERVER_P12=${PKI_BASE}/${THIS_CA}/private/${THIS_SRV}.p12
-export CA_CERT=${PKI_BASE}/${THIS_CA}/ca.crt
-export EXISTCA_HOME THIS_CA
-
-$FAKE sh $EXISTCA_HOME/reconfig-jetty.sh
-if [ $? -ne 0 ]; then
-    logmsg "ERROR \"$THIS_CA\" - failed to reconfig jetty"
-    # err out with exit code 4 (jetty reconfig)
-    exit 4
-fi
 
 
 exit 0
