@@ -10,15 +10,14 @@ let $home := system:get-exist-home()
 
 let $ca-home := $existca:ca-home
 let $pki-home := $ca-home || '/pki'
-let $ca-uuid := util:uuid()
-let $cert-data-collection := $existca:cert-data-collection
 
 (:let $data := request:get-data():)
-let $data := <CA name="" nicename="my name" servername="ca.example.org">
+let $data := <CA name="" nicename="my name">
             <keysize>4096</keysize>
             <expire>1825</expire>
             <capass>aaa</capass>
             <expiry-date/>
+	    <dnsname>ca.example.org</dnsname>
             <country/>
             <province/>
             <city/>
@@ -54,12 +53,11 @@ let $data := <CA name="" nicename="my name" servername="ca.example.org">
             </rejected-requests>
         </CA>
 
-(: let $cert-tmp := $existca:ca-home || '/pki/' || $ca-uuid || '.xml' :)
-let $cert-tmp := $pki-home || '/' || $ca-uuid || '.xml'
-
 (: 
  : prepare options for calling external ca-scripts via shell
  :)
+let $cert-tmp := $pki-home || '/' || util:uuid() || '.xml'
+
 let $create-ca-options :=
    <options>
        <workingDir>{$ca-home}</workingDir>
@@ -77,65 +75,33 @@ let $create-ca-options :=
            <env name="EXISTCA_XMLOUT" value="{$cert-tmp}"/>
            <env name="EXISTCA_HOME" value="{$ca-home}"/>
            <env name="PKI_BASE" value="{$pki-home'}"/>
-
-	   <!-- next ten only for create-casrvcert, will go away here -->
-           <env name="EXISTCA_SRVNAME" value="{$data/@servername}"/>
-           <env name="EXISTCA_SRVPASS" value="{$data/capass}"/>
-           <env name="EXISTCA_SRVKEYSIZE" value="{$data/keysize}"/>
-           <env name="EXISTCA_SRVEXPIRE" value="{$data/expire}"/>
-           <env name="EXISTCA_SRVCOUNTRY" value="{$data/country}"/>
-           <env name="EXISTCA_SRVPROVINCE" value="{$data/province}"/>
-           <env name="EXISTCA_SRVCITY" value="{$data/city}"/>
-           <env name="EXISTCA_SRVORG" value="{$data/org}"/>
-           <env name="EXISTCA_SRVOU" value="{$data/org-unit}"/>
-           <env name="EXISTCA_SRVEMAIL" value="{$data/email}"/>
-
-	   <!-- next three only for reconfig-jetty, will go away here -->
-           <env name="JETTY_HOME" value="{$existca:jetty-home}"/>
-           <env name="JETTY_PORT" value="{environment-variable("JETTY_PORT")}"/>
-           <env name="JAVA_HOME" value="{environment-variable("JAVA_HOME")}"/>
-           
        </environment>
    </options>
  
 let $result := (process:execute(("sh", "create-ca.sh"), $create-ca-options))
 
 let $generated-cert-file:=file:read($cert-tmp)
+let $cert-data-collection := xmldb:create-collection($existca:cert-data-collection, data($generated-cert-file//CA/@name))
 
 let $foo := if($result/@exitCode=0) then
-        let $resourceName := $ca-uuid || ".xml"
+        let $resourceName := "ca.xml"
         return xmldb:store($cert-data-collection, $resourceName, $generated-cert-file)
 else ()
      
 
-return $result
-(:return $generated-cert-file:)
-
-(:let $uuid := util:uuid() :)
-
-(: this part does not work for some reason :)
-(:let $new-data := update value $data/CA/@id with string($uuid):)
-
-(:
-let $resourceName := data($uuid) || ".xml"
-let $stored :=  xmldb:store($cert-data-collection, $resourceName, $data)
-return $data
-
-:)
-
-(: EXPERIMENTAL: factor out reconfig-hetty.sh from create-ca.sh :)
-
 (: 
  : prepare options for calling external ca-scripts/create-casrvcert.sh via shell
  :)
-(: 
-let $create-casrvcert-options :=
+
+let $casrvcert-tmp := $pki-home || '/' || util:uuid() || '.xml'
+
+let $create-cert-options :=
    <options>
        <workingDir>{$ca-home}</workingDir>
        <environment>
            <env name="EXISTCA_CAPASS" value="{$data/capass}"/>
            <env name="EXISTCA_CANAME" value="{$data/@name}"/>
-           <env name="EXISTCA_CERTNAME" value="{$data/@servername}"/>
+           <env name="EXISTCA_CERTNAME" value="{$data/dnsname}"/>
            <env name="EXISTCA_CERTPASS" value="{$data/capass}"/>
            <env name="EXISTCA_CERTTYPE" value="server"/>
            <env name="EXISTCA_CERTKEYSIZE" value="{$data/keysize}"/>
@@ -152,15 +118,21 @@ let $create-casrvcert-options :=
        </environment>
    </options>
 
-let $result := (process:execute(("sh", "create-casrvcert.sh"), $create-casrvcert-options))
+let $result := (process:execute(("sh", "create-cert.sh"), $create-cert-options))
 
-:)
+let $generated-cert-file:=file:read($casrvcert-tmp)
+
+let $foo := if($result/@exitCode=0) then
+        let $resourceName := util:uuid() || ".xml"
+        return xmldb:store($cert-data-collection, $resourceName, $generated-cert-file)
+else ()
+     
 
 (: 
  : prepare options for calling external ca-scripts/reconfig-jetty.sh via shell
  :)
-(: 
-let $srv-p12-file := $pki-home || '/' || $data/@name || 'private' || $data/@servername || '.p12'
+
+let $srv-p12-file := $pki-home || '/' || $data/@name || 'private' || $data/dnsname || '.p12'
 let $reconf-jetty-options :=
    <options>
        <workingDir>{$ca-home}</workingDir>
@@ -176,4 +148,24 @@ let $reconf-jetty-options :=
  
 let $result := (process:execute(("sh", "reconfig-jetty.sh"), $reconf-jetty-options))
 
+(: check exit code 
+return
+	<foobar/>
 :)
+
+
+return $result
+(:return $generated-cert-file:)
+
+(:let $uuid := util:uuid() :)
+
+(: this part does not work for some reason :)
+(:let $new-data := update value $data/CA/@id with string($uuid):)
+
+(:
+let $resourceName := data($uuid) || ".xml"
+let $stored :=  xmldb:store($cert-data-collection, $resourceName, $data)
+return $data
+
+:)
+
