@@ -10,11 +10,12 @@ Sample data
 
   <!-- container for all CAs -->
     <CAs>
-        <CA name="" nicename="" servername="">
+        <CA name="" nicename="">
             <keysize/>
             <expire/>
             <capass/>
             <expiry-date/>
+	    <dnsname/>
             <country/>
             <province/>
             <city/>
@@ -29,6 +30,7 @@ Sample data
                     <status/>
                     <expire-timestamp/>
                     <serial/>
+		    <expiry-date/>
                     <certpass/>
                     <country/>
                     <province/>
@@ -52,18 +54,19 @@ Sample data
 <!--        
         nicename is the CA name as entered by user, possibly with spaces
 	name is nicename without all special chars, for use as file name
-        <CA name="" nicename="" servername="">
+        <CA name="" nicename="">
 
         CA metadata
 	    <keysize/>
 	    <expire/>
             <capass>craps</capass>
+	    <current-serial/>
+	    <dnsname/>
 
 	these are just textual representations for display-ca
             <expiry-date/>
-            <ca-cert-txt/>
 
-	obsolete metadata, may be used in Expert Mode
+	city/country/... metadata
             <country>DE</country>
             <province/>
             <city/>
