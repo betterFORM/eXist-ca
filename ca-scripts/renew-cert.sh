@@ -9,6 +9,15 @@
 #   EXISTCA_CERTTYPE    (eg "client", "server")
 #   EXISTCA_CERTEXPIRE  (eg 1825)
 #   EXISTCA_CERTPASS    (eg "secret")
+#   EXISTCA_HOME        (eg /usr/local/eXistCA)
+#   EXISTCA XMLOUT
+#   PKI_BASE
+#
+# This script returns the following exit codes:
+#   0  - success
+#   1  - fail: parameter problem
+#   2  - fail: 
+
 
 # required env vars as documented above
 REQ_ENV="\
@@ -23,37 +32,32 @@ REQ_ENV="\
 "
 
 #FAKE="echo"
-#DEBUG=1
-if [ -n "$DEBUG" ]; then
-    echo -n "cmdline: "
-    echo $*
-    echo -n "pwd: "
-    pwd
-    echo "environment:"
-    env
-    echo "stdin:"
-    while read line; do echo $line; done
-fi
 
+# dump cert data as XML
+dump_xml () {
+}
 
 # source common script vars
 . $EXISTCA_HOME/script-vars.sh
 
+err=0
+
 # env sanity checks
 if ! checkenv $REQ_ENV; then
-    echo "ERROR - refuse to work on incomplete data"
-    exit 1
+    logmsg "ERROR - refuse to work on incomplete data"
+    err=1
 fi
 
-# XXX validate all user provided input data!
-
-err=0
+### validate all user provided input data
 
 # cleanup obscure chars out of passed CA name, for use as file name
 THIS_CA=`echo -n "$EXISTCA_CANAME" | tr -cd '[:alnum:]'`
 
 # cleanup obscure chars out of passed Common Name, for use as file name
 THIS_CN=`echo -n "$EXISTCA_CERTNAME" | tr -cd '[:alnum:].-'`
+
+
+### setup env for easyrsa
 
 # define EASYRSA_PKI to point to $THIS_CA directory
 export EASYRSA_PKI=${PKI_BASE}/${THIS_CA}
@@ -74,7 +78,7 @@ EXISTCA_AUTHIN="env:EXISTCA_CAPASS"
 EXISTCA_AUTHOUT=
 $FAKE ./easyrsa revoke "$THIS_CN"
 if [ $? -ne 0 ]; then
-    echo "ERROR revoking $EXISTCA_CERTTYPE certificate"
+    logmsg "ERROR \"$THIS_CA\" - revoking $EXISTCA_CERTTYPE certificate"
     err=1
 fi
 
@@ -83,7 +87,7 @@ EXISTCA_AUTHIN="env:EXISTCA_CAPASS"
 EXISTCA_AUTHOUT=
 $FAKE ./easyrsa sign-req $EXISTCA_CERTTYPE "$THIS_CN"
 if [ $? -ne 0 ]; then
-    echo "failed to sign $EXISTCA_CERTTYPE certificate"
+    logmsg "ERROR \"$THIS_CA\" - failed to sign $EXISTCA_CERTTYPE certificate"
     err=1
 fi
 
@@ -97,7 +101,7 @@ else
 fi
 $FAKE ./easyrsa export-p12 "$THIS_CN"
 if [ $? -ne 0 ]; then
-    echo "failed to export certificate to PKCS#12 format"
+    logmsg "ERROR \"$THIS_CA\" - failed to export certificate to PKCS#12 format"
     err=1
 fi
 
@@ -105,15 +109,19 @@ fi
 EXISTCA_AUTHIN="env:EXISTCA_CAPASS"
 $FAKE ./easyrsa gen-crl
 if [ $? -ne 0 ]; then
-    echo "ERROR creating certificate revocation list"
+    logmsg "ERROR \"$THIS_CA\" - creating certificate revocation list"
     err=1
 fi
 
 
+# dump XML data to stdout regardless of possible errors
+dump_xml
+
+# err out with exit code 2
 if [ $err -ne 0 ]; then
-    echo "ERROR renewing $EXISTCA_CERTTYPE certificate"
-    exit 1
-else
-    exit 0
+    logmsg "ERROR \"$THIS_CA\" - renewing $EXISTCA_CERTTYPE certificate"
+    exit 2
 fi
 
+
+exit 0
