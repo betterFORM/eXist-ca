@@ -57,7 +57,6 @@ dump_xml () {
     #srv_pkcs12=`cat $EASYRSA_PKI/private/${THIS_CN}.p12`
     srv_pkcs12='this is binary and needs encoding'
     srv_req=`cat $EASYRSA_PKI/reqs/${THIS_CN}.req`
-    ca_serial=`tr -dc "[:xdigit:]" <$EASYRSA_PKI/serial`
     read status expire serial unkn cn <<INDEX
 $(grep "$THIS_CN" $EASYRSA_PKI/index.txt)
 INDEX
@@ -65,6 +64,8 @@ INDEX
     printf "
 <cert name=\"$THIS_CN\" nicename=\"$EXISTCA_CERTNAME\">
   <certtype>$EXISTCA_CERTTYPE</certtype>
+  <keysize>$EXISTCA_CERTKEYSIZE</keysize>
+  <expire>$EXISTCA_CERTEXPIRE</expire>
   <status>$status</status>
   <expire-timestamp>$expire</expire-timestamp>
   <serial>$serial</serial>
