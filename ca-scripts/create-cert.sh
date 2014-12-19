@@ -52,11 +52,13 @@ REQ_ENV="\
 
 # dump cert data as XML
 dump_xml () {
-    srv_crt=`cat $EASYRSA_PKI/issued/${THIS_CN}.crt`
-    srv_key=`cat $EASYRSA_PKI/private/${THIS_CN}.key`
-    #srv_pkcs12=`cat $EASYRSA_PKI/private/${THIS_CN}.p12`
-    srv_pkcs12='this is binary and needs encoding'
-    srv_req=`cat $EASYRSA_PKI/reqs/${THIS_CN}.req`
+    cert_crt=`cat $EASYRSA_PKI/issued/${THIS_CN}.crt`
+    cert_key=`cat $EASYRSA_PKI/private/${THIS_CN}.key`
+    #cert_pkcs12=`cat $EASYRSA_PKI/private/${THIS_CN}.p12`
+    cert_pkcs12='this is binary and needs encoding'
+    cert_req=`cat $EASYRSA_PKI/reqs/${THIS_CN}.req`
+    cert_text=`sh ./easyrsa show-cert "$THIS_CN"`
+    req_text=`sh ./easyrsa show-req "$THIS_CN"`
     read status expire serial unkn cn <<INDEX
 $(grep "$THIS_CN" $EASYRSA_PKI/index.txt)
 INDEX
@@ -77,10 +79,12 @@ INDEX
   <org>$EXISTCA_CERTORG</org>
   <org-unit>$EXISTCA_CERTOU</org-unit>
   <email>$EXISTCA_CERTEMAIL</email>
-  <cert>$srv_crt</cert>
-  <key>$srv_key</key>
-  <pkcs12>$srv_pkcs12</pkcs12>
-  <req>$srv_req</req>
+  <cert>$cert_crt</cert>
+  <key>$cert_key</key>
+  <pkcs12>$cert_pkcs12</pkcs12>
+  <req>$cert_req</req>
+  <cert-textual>$cert_text</cert-textual>
+  <req-textual>$req_text</req-textual>
 </cert>
 " >$EXISTCA_XMLOUT
 }
@@ -160,7 +164,7 @@ else
     genreq_opt=nopass
 fi
 EXISTCA_AUTHIN=
-$FAKE sh ./easyrsa gen-req "$EASYRSA_REQ_CN" $genreq_opt
+$FAKE sh ./easyrsa gen-req "$THIS_CN" $genreq_opt
 if [ $? -ne 0 ]; then
     logmsg "ERROR \"$THIS_CA\" - failed to generate certificate request"
     err=1

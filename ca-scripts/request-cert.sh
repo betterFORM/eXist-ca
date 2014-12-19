@@ -45,8 +45,9 @@ export REQ_ENV="\
 
 # dump cert request data as XML
 dump_xml () {
-    srv_key=`cat $EASYRSA_PKI/private/${THIS_CN}.key`
-    srv_req=`cat $EASYRSA_PKI/reqs/${THIS_CN}.req`
+    cert_key=`cat $EASYRSA_PKI/private/${THIS_CN}.key`
+    cert_req=`cat $EASYRSA_PKI/reqs/${THIS_CN}.req`
+    req_text=`sh ./easyrsa show-req "$THIS_CN"`
     printf "
 <cert name=\"$THIS_CN\" nicename=\"$EXISTCA_CERTNAME\">
   <certtype>$EXISTCA_CERTTYPE</certtype>
@@ -64,9 +65,11 @@ dump_xml () {
   <org-unit>$EXISTCA_CERTOU</org-unit>
   <email>$EXISTCA_CERTEMAIL</email>
   <cert/>
-  <key>$srv_key</key>
+  <key>$cert_key</key>
   <pkcs12/>
-  <req>$srv_req</req>
+  <req>$cert_req</req>
+  <cert-textual/>
+  <req-textual>$req_text</req-textual>
 </cert>
 " >$EXISTCA_XMLOUT
 }

@@ -65,10 +65,11 @@ Sample data
                     <org/>
                     <org-unit/>
                     <email/>
-                    <cert/>
                     <key/>
                     <pkcs12/>
                     <req/>
+                    <cert-textual/>
+                    <req-textual/>
                 </cert>
             </certs>
             <pending-requests>

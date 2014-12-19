@@ -33,9 +33,10 @@ REQ_ENV="\
 
 # dump cert data as XML
 dump_xml () {
-    srv_crt=`cat $EASYRSA_PKI/issued/${THIS_CN}.crt`
-    #srv_pkcs12=`cat $EASYRSA_PKI/private/${THIS_CN}.p12`
-    srv_pkcs12='this is binary and needs encoding'
+    cert_crt=`cat $EASYRSA_PKI/issued/${THIS_CN}.crt`
+    #cert_pkcs12=`cat $EASYRSA_PKI/private/${THIS_CN}.p12`
+    cert_pkcs12='this is binary and needs encoding'
+    cert_text=`sh ./easyrsa show-cert "$THIS_CN"`
     read status expire serial unkn cn <<INDEX
 $(grep "$THIS_CN" $EASYRSA_PKI/index.txt)
 INDEX
@@ -49,8 +50,9 @@ INDEX
   <expire-timestamp>$expire</expire-timestamp>
   <serial>$serial</serial>
   <expiry-date>$exp_date</expiry-date>
-  <cert>$srv_crt</cert>
-  <pkcs12>$srv_pkcs12</pkcs12>
+  <cert>$cert_crt</cert>
+  <pkcs12>$cert_pkcs12</pkcs12>
+  <cert-textual>$cert_text</cert-textual>
 </cert>
 " >$EXISTCA_XMLOUT
 }
