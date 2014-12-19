@@ -24,9 +24,6 @@
                         <org/>
                         <org-unit/>
                         <email/>
-                        <certs>
-                            <cert name="" type="" serial=""/>
-                        </certs>
                         <pending-requests>
                             <req name="" type=""/>
                         </pending-requests>
@@ -232,20 +229,30 @@
                             </xf:input>
                             <div class="alert alert-info">
                                 <i class="fa fa-info"/>
-                            The name of your certificate authority e.g. 'my-site.com'</div>
+                                
+                                Please input a descriptive name for your trust center. <br/>
+                                <h5>Examples:</h5>
+                                <ul>
+                                    <li>John Doe</li>
+                                    <li>mycompany.com</li>
+                                </ul>
+                            </div>
                         </li>
                         <li class="keysize-item hidden">
-                        <!--
-                            <xf:trigger class="keysize-btn 2048 -btn -btn-warning">
-                                <xf:label>2048</xf:label>
-                            </xf:trigger>
-                            <xf:trigger class="keysize-btn 4096  -btn -btn-warning">
-                                <xf:label>4096</xf:label>
-                            </xf:trigger>
-                            <xf:trigger class="keysize-btn 8192 -btn -btn-warning">
-                                <xf:label>8182</xf:label>
-                            </xf:trigger>
-                        -->
+                            <h3>Level of Security</h3>
+                            <div class="keysize-btn bit2048 btn btn-warning" role="button" tabindex="0" title="standard security level">
+                                <!-- <h5>Standard</h5> -->
+                                <i class="fa fa-key"/>
+                                <span>2048 bit</span>
+                            </div>
+                            <div class="keysize-btn bit4096 btn btn-warning" role="button" tabindex="0" title="high security level">
+                                <i class="fa fa-key"/>
+                                <span>4096 bit</span>
+                            </div>
+                            <div class="keysize-btn bit8192 btn btn-warning" role="button" tabindex="0" title="extreme security level">
+                                <i class="fa fa-key"/>
+                                <span>8192 bit</span>
+                            </div>
                             <xf:select1 id="key-size" ref="keysize" selection="closed" class="-form-control" appearance="full" incremental="true">
                                 <xf:label>Keysize</xf:label>
                                 <xf:item>
@@ -260,7 +267,7 @@
                                     <xf:label>8192 bit</xf:label>
                                     <xf:value>8192</xf:value>
                                 </xf:item>
-                                <xf:action ev:event="xforms-value-changed">
+                                <xf:action ev:event="xforms-value-changed" style="display:none;visibility:hidden;">
                                     <script>
                                         $(".keysize-item &gt; input").addClass("fadeOutUp animated");
 
@@ -283,7 +290,17 @@
                             </div>
                         </li>
                         <li class="expire-item hidden">
-                            <xf:select1 ref="expire" selection="closed" class="-form-control" appearance="full" incremental="true">
+                            <h3>Expires in</h3>
+                            <div class="expire-btn oneyear btn btn-warning" role="button" tabindex="0" title="expires in 1 year">
+                                <span>1 year</span>
+                            </div>
+                            <div class="expire-btn threeyears btn btn-warning" role="button" tabindex="0" title="expires in 3 years">
+                                <span>3 years</span>
+                            </div>
+                            <div class="expire-btn fiveyears btn btn-warning" role="button" tabindex="0" title="expires in 5 years">
+                                <span>5 years</span>
+                            </div>
+                            <xf:select1 id="expire" ref="expire" selection="closed" class="-form-control" appearance="full" incremental="true">
                                 <xf:label>Expires</xf:label>
                                 <xf:item>
                                     <xf:label>1 year</xf:label>
@@ -469,7 +486,7 @@
         <script type="text/javascript" src="resources/scripts/jquery.min.js"/>
         <script>
         $(document).ready(function() {
-            fluxProcessor.skipShutdown=true;
+            fluxProcessor.skipshutdown=true;
             
             $("#reload").on("click",function(){
                 window.location.reload();    
@@ -479,6 +496,28 @@
                 console.log("tr clicked"); 
                 fluxProcessor.dispatchEvent("dummy");
             });
+            
+            $(".keysize-btn.bit2048").on("click",function(){
+                console.log("2048 was clicked");
+                fluxProcessor._setControlValue("key-size","2048");    
+            });
+            $(".keysize-btn.bit4096").on("click",function(){
+                fluxProcessor._setControlValue("key-size","4096");    
+            });
+            $(".keysize-btn.bit8192").on("click",function(){
+                fluxProcessor._setControlValue("key-size","8192");    
+            });
+            $(".expire-btn.oneyear").on("click",function(){
+            console.log("clicked on year");
+                fluxProcessor._setControlValue("expire","365");    
+            });
+            $(".expire-btn.threeyears").on("click",function(){
+                fluxProcessor._setControlValue("expire","1095");    
+            });
+            $(".expire-btn.fiveyears").on("click",function(){
+                fluxProcessor._setControlValue("expire","1825");    
+            });
+            
         });
         </script>
     </body>
