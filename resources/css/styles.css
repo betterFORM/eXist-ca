@@ -22,6 +22,8 @@ body {
   width: 100%;
   position: relative;
   padding-left: 60px;
+  text-align: left;
+  margin-top: 30px;
 }
 .alert .fa-info {
   font-size: 48px;
@@ -34,6 +36,19 @@ body {
   position: absolute;
   left: 10px;
   top: 20px;
+}
+.alert h5 {
+  padding: 0;
+  margin-bottom: 0;
+}
+.alert ul {
+  list-style: normal;
+  list-style-type: initial;
+  margin: 0;
+  padding: 0 0 0 15px;
+}
+.alert ul li {
+  margin: 3px;
 }
 .alert-info {
   color: #4682B4;
@@ -79,6 +94,77 @@ input.form-control {
 }
 .CA-form {
   margin-top: 70px;
+}
+.keysize-item {
+  width: 100%;
+  text-align: center;
+  padding: 10px 0;
+}
+.keysize-item .fa-key {
+  font-size: 1.6em;
+  display: block;
+}
+.keysize-item .keysize-btn {
+  display: inline-block;
+  width: 30%;
+  padding: 10px 0;
+}
+.keysize-item .bit4096 {
+  padding: 15px 0;
+}
+.keysize-item .bit4096 .fa-key {
+  font-size: 2.2em;
+}
+.keysize-item .bit4096 span {
+  font-size: 1em;
+}
+.keysize-item .bit8192 {
+  padding: 20px 0;
+}
+.keysize-item .bit8192 .fa-key {
+  font-size: 2.6em;
+}
+.keysize-item .bit8192 span {
+  font-size: 1.1em;
+}
+.keysize-item h3 {
+  text-align: left;
+  margin-bottom: 30px;
+  font-size: 22px;
+}
+.keysize-item span {
+  font-size: 12px;
+}
+.keysize-item .btn {
+  white-space: normal;
+}
+.keysize-item .xfControl {
+  display: inline-block;
+  width: 30%;
+}
+.keysize-item button {
+  width: 100%;
+}
+#key-size {
+  display: none;
+  visibility: hidden;
+}
+#expire {
+  display: none;
+  visibility: hidden;
+}
+.expire-btn {
+  display: block;
+  margin-bottom: 3px;
+}
+.oneyear {
+  width: 33%;
+}
+.threeyears {
+  width: 66%;
+}
+.fiveyears {
+  width: 100%;
 }
 .xfSelect1 .xfValue {
   background: transparent;

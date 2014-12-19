@@ -78,6 +78,7 @@ let $create-ca-options :=
        </environment>
    </options>
  
+ 
 let $result := (process:execute(("sh", "create-ca.sh"), $create-ca-options))
 
 let $generated-cert-file:=file:read($cert-tmp)
@@ -87,7 +88,8 @@ let $foo := if($result/@exitCode=0) then
         let $resourceName := "ca.xml"
         return xmldb:store($cert-data-collection, $resourceName, $generated-cert-file)
 else ()
-     
+
+
 
 (: 
  : prepare options for calling external ca-scripts/create-casrvcert.sh via shell

@@ -60,9 +60,18 @@ As a first step of using 'the product' the admin creates a root certificate for 
 
 ### Result
 
-The system will create a CA cert and store it to the local keystore. Further the cert will be deployed into jetty for use with the local eXistdb installation.
+The system will create a CA cert and server-cert (single CA edition) and store it to the local keystore. Further the cert will be deployed into jetty for use with the local eXistdb installation.
  
 The admin is messaged about the successful creation.
+
+### Remarks
+Once we have multiple CA support the generation of the server cert will become an optional step. Association of CA
+and server must be made possible then.
+
+## 12. create cert
+
+### Steps
+### Result
 
 ## 2. list certs
 
