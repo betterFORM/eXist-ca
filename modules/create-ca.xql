@@ -131,7 +131,7 @@ else ()
      
 
 (: 
- : prepare options for calling external ca-scripts/reconfig-jetty.sh via shell
+ : prepare options for calling external ca-scripts/sys-sccripts/reconfig-jetty.sh via shell
  :)
 
 let $srv-p12-file := $pki-home || '/' || $data/@name || 'private' || $data/dnsname || '.p12'
@@ -148,7 +148,7 @@ let $reconf-jetty-options :=
        </environment>
    </options>
  
-let $result := (process:execute(("sh", "reconfig-jetty.sh"), $reconf-jetty-options))
+let $result := (process:execute(("sh", "sys-sccripts/reconfig-jetty.sh"), $reconf-jetty-options))
 
 (: check exit code 
 return

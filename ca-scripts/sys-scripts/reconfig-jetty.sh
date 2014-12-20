@@ -60,6 +60,8 @@ if ! verify_posint $JETTY_PORT; then
 fi
 
 
+JETTY_SAMPLES=$EXISTCA_HOME/sys-scripts/jetty-samples
+
 ### setup jetty keystore
 
 JETTY_KEYSTORE=${JETTY_HOME}/etc/keystore
@@ -67,7 +69,7 @@ HARDCODED_PW=secret
 USE_PW=$HARDCODED_PW
 #RANDPW=`dd if=/dev/urandom bs=1024 count=1 2>/dev/null | md5`
 #USE_PW=$RANDPW
-$FAKE cp $EXISTCA_HOME/jetty-samples/example-keystore $JETTY_KEYSTORE
+$FAKE cp $JETTY_SAMPLES/example-keystore $JETTY_KEYSTORE
 if [ $? -ne 0 ]; then
     logmsg "ERROR - failed to install default jetty keystore"
     err=1
@@ -117,7 +119,7 @@ fi
 ### setup jetty
 
 # rewrite jetty.xml file
-JETTY_XML_SRC=$EXISTCA_HOME/jetty-samples/example-jetty.xml
+JETTY_XML_SRC=$JETTY_SAMPLES/example-jetty.xml
 HARDCODED_PORT=8443
 if [ -n "$JETTY_PORT" -a "$JETTY_PORT" -ne "$HARDCODED_PORT" ]; then
     SED_PORT="s/${HARDCODED_PORT}/${JETTY_PORT}/;"
@@ -130,7 +132,7 @@ fi
 
 # patch webdefaults.xml to support cert mime types
 # XXX work in progress, for now we copy our sample file
-$FAKE cp $EXISTCA_HOME/jetty-samples/example-webdefault.xml $JETTY_HOME/etc
+$FAKE cp $JETTY_SAMPLES/example-webdefault.xml $JETTY_HOME/etc
 if [ $? -ne 0 ]; then
     logmsg "ERROR - failed to install default jetty webdefault.xml"
     err=1
