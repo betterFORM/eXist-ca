@@ -22,6 +22,10 @@ declare function local:init() {
     :)
     let $sync := file:sync("/db/apps/eXistCA/ca-scripts",$ca-scripts,())
     let $easyrsa := file:sync("/db/apps/eXistCA/resources/easyrsa3",$ca-scripts || "/easyrsa",())
+    (:
+    also sync sys-scripts to BASEDIR
+    :)
+    let $sys := file:sync("/db/apps/eXistCA/sys-scripts",$ca-scripts || "/sys-scripts",())
     
     let $fake := xmldb:create-collection("/db/apps/eXistCA/data","ca")
     return ()
