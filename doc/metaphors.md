@@ -18,18 +18,32 @@ A certificate, just like a passport or ID card, is:
 - it is valid for some years and needs to be renewed afterwards
 - you need to possess and show it, and it must be valid, to access restricted 
   resourcea (travel to a foreign country)
-- the person holding the passport needs to interact with the authority (government)
+- the person holding the passport needs to interact with the authority (government):
 -- apply for a passport
 -- passport gets issued by the authority
 -- pickup and use new passport
--- renew the passport when it expires
--- paasport gets revoked by the authority (if stolen)
+-- renew passport when it expires
+-- passport gets revoked by the authority (if stolen)
 
 Although similar to passports, digital certificates are different in these aspects:
 
 - certs can also be issued to network hosts, not only to persons
 - certs include a crypto public key pair that can be used for crypto operations, unlike passports (yet)
 
-## Scope of Certificates ("global" vs. "local" Validity)
+## Certificates are not like passports, more like company ID cards
+
+Although X.509 certificates have a strong similarity to passports, there 
+are some differences:
+
+- certificates can also be issued to Internet servers like "www.example.org" or "mail.example.org" (think passports for servers)
+- certificates can be used for crypto operations, unlike passports
+- passports are issued by nation state authorities (governments), while anyone may create ID cards that are valid for "something"
+
+This last one is important because it leads to the problem of "trust". To 
+illustrate that, consider the following scenario:
+
+[...]
+
+## Trust (or lack thereof)
 
 [...]
