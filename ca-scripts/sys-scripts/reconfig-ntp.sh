@@ -23,13 +23,24 @@ export REQ_ENV="\
 
 #FAKE=echo
 
-# source common script vars
-#. $EXISTCA_HOME/script-vars.sh
+err=0
+
+# source common script vars (generic, not OS specific vars and functions)
+. $APPLIANCE_HOME/common.sh
+
+OSDIR=`determine_osdir`
+if [ -n "$OSDIR" ]; then
+    logmsg "ERROR - can not determine OS"
+    err=1
+else
+    # source common script vars (OS specific vars and functions)
+    . $APPLIANCE_HOME/$OSDIR/os-common.sh
+fi
 
 # env sanity checks
 if ! checkenv $REQ_ENV; then
     echo "ERROR - refuse to work on incomplete data"
-    exit 1
+    err=1
 fi
 
 ### validate user provided input data
@@ -38,6 +49,14 @@ fi
 SRV1=`echo -n "$NTP_SRV1" | tr -cd '[:alnum:].-'`
 SRV2=`echo -n "$NTP_SRV2" | tr -cd '[:alnum:].-'`
 SRV3=`echo -n "$NTP_SRV3" | tr -cd '[:alnum:].-'`
+
+# err out with exit code 1 (parameter problem)
+if [ $err -ne 0 ]; then
+    logmsg "ERROR reconfig network: parameter problem"
+    #printf "<XXX/>"
+    exit 1
+fi
+
 
 # call OS specific function to reconfigzre and restart ntpd
 # this function is defined in $OS/os-common.sh

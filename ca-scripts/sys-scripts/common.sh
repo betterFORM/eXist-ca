@@ -23,6 +23,27 @@ checkenv () {
     return $enverr
 }
 
+# determine OS, release and distribution that we're running oo
+determine_osdir () {
+    os_type=`uname -s`
+    #os_release=`uname -r`
+    #os_host=`uname -n`
+
+    case "$os_type" in
+	OpenBSD)
+	    return OpenBSD
+	    ;;
+	Linux)
+	    # determine Linux distribution
+	    [ -f /etc/debian_version ] && return Debian
+	    ;;
+    esac
+
+    logmsg "OS $os_type yet unsupported"
+    return ""
+}
+
+# create timestamp string fragment for backup file names
 mkbackuptimestamp () {
     echo "save.`date '+%F-%H:%M:%S'`"
 }

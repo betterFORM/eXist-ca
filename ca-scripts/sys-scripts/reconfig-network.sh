@@ -27,31 +27,19 @@ dump_xml () {
 #" >$EXISTCA_XMLOUT
 }
 
+err=0
+
 # source common script vars (generic, not OS specific vars and functions)
 . $APPLIANCE_HOME/common.sh
 
-# determine OS, release and distribution that we're running oo
-OS_TYPE=`uname -s`
-OS_RELEASE=`uname -r`
-OS_HOST=`uname -n`
-
-case "$OS_TYPE" in
-    OpenBSD)
-	THIS_OS=OpenBSD
-	;;
-    Linux)
-	# determine Linux distribution
-	#THIS_OS=Debian
-	: ;;
-    *)
-	logmsg "OS $OS_TYPE yet unsupported"
-	;;
-esac
-
-# source common script vars (OS specific vars and functions)
-. $APPLIANCE_HOME/$THIS_OS/os-common.sh
-
-err=0
+OSDIR=`determine_osdir`
+if [ -n "$OSDIR" ]; then
+    logmsg "ERROR - can not determine OS"
+    err=1
+else
+    # source common script vars (OS specific vars and functions)
+    . $APPLIANCE_HOME/$OSDIR/os-common.sh
+fi
 
 # env sanity checks
 if ! checkenv $REQ_ENV; then
@@ -65,6 +53,12 @@ fi
 
 # validate passed $IF_DHCP is boolean
 
+# err out with exit code 1 (parameter problem)
+if [ $err -ne 0 ]; then
+    logmsg "ERROR reconfig network: parameter problem"
+    printf "<XXX/>"
+    exit 1
+fi
 
 
 ###
