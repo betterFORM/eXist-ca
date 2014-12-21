@@ -18,3 +18,9 @@ reconfig_if () {
     return 1
 }
 
+# rebuild ntpd.conf and restart ntp daemon
+reconfig_ntpd () {
+    srvs=$*
+    return 1
+}
+
