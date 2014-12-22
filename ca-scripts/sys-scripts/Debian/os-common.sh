@@ -1,8 +1,10 @@
 #!/bin/sh 
 
-
+# Debian network config file
 INTERFACES=/etc/network/interfaces
 
+
+### functions for network configuration
 
 # check if interface is already configured for DHCP
 get_if_dhcp () {
@@ -13,8 +15,12 @@ get_if_dhcp () {
 # create interface configuration for DHCP
 set_if_dhcp () {
     if=$1
-    # better leave that to a perl script, way too complicated to do in shell..
-    return 1
+    file=$INTERFACES
+    bak="$file.`mkbackuptimestamp`"
+    [ -f "$file" ] && cp -p $file $bak
+    # this is a gross hack that more or less works in common cases only
+    # better leave that to a perl script, way too complicated to do in shell
+    sed -e '/static/dhcp/;' <$bak >$file
 }
 
 # change interface configuration
@@ -22,6 +28,9 @@ reconfig_if () {
     if=$1
     ifup $if
 }
+
+
+### functions for NTP configuration
 
 # rebuild ntpd.conf
 reconfig_ntpd () {
@@ -46,6 +55,22 @@ restart_ntpd () {
 	return 1
     else
 	service ntp start
+	return $?
+    fi
+}
+
+
+### functions for OpenVPN configuration
+
+# restart openvpn daemon
+restart_openvpn () {
+    # explicitly kill and start rather than "/etc/rc.d/openvpn restart"
+    pkill openvpn
+    if pgrep -lf openvpn >/dev/null; then
+	logmsg "ERROR - openvpn still running"
+	return 1
+    else
+	service openvpn start
 	return $?
     fi
 }

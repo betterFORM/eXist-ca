@@ -1,5 +1,8 @@
 #!/bin/sh 
 
+
+### functions for network configuration
+
 # check if interface is already configured for DHCP
 get_if_dhcp () {
     if=$1
@@ -27,7 +30,10 @@ reconfig_if () {
     sh /etc/netstart $if
 }
 
-# rebuild ntpd.conf and restart ntp daemon
+
+### functions for NTP configuration
+
+# rebuild ntpd.conf
 reconfig_ntpd () {
     srvs=$*
     file=/etc/ntpd.conf
@@ -39,7 +45,10 @@ reconfig_ntpd () {
 	logmsg "adding NTP server $s"
 	echo "server $s" >>$file
     done
+}
 
+# restart ntp daemon
+restart_ntpd () {
     # explicitly kill and start rather than "/etc/rc.d/ntpd restart"
     pkill ntpd
     if pgrep -lf ntpd >/dev/null; then
@@ -47,6 +56,22 @@ reconfig_ntpd () {
 	return 1
     else
 	/etc/rc.d/ntpd start
+	return $?
+    fi
+}
+
+
+### functions for NTP configuration
+
+# restart OpenVPN daemon
+restart_openvpn () {
+    # explicitly kill and start rather than "/etc/rc.d/openvpn restart"
+    pkill openvpn
+    if pgrep -lf openvpn >/dev/null; then
+	logmsg "ERROR - openvpn still running"
+	return 1
+    else
+	/etc/rc.d/openvpn start
 	return $?
     fi
 }
