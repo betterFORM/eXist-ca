@@ -46,10 +46,10 @@ fi
 ### nothing to validate
 
 # cleanup obscure chars out of passed CA name, for use as file name
-THIS_CA=`echo -n "$EXISTCA_CANAME" | tr -cd '[:alnum:]'`
+THIS_CA=`echo "$EXISTCA_CANAME" | tr -cd '[:alnum:]'`
 
 # cleanup obscure chars out of passed Common Name, for use as file name
-THIS_CN=`echo -n "$EXISTCA_CERTNAME" | tr -cd '[:alnum:].-'`
+THIS_CN=`echo "$EXISTCA_CERTNAME" | tr -cd '[:alnum:].-'`
 
 # err out with exit code 1 (parameter problem)
 if [ $err -ne 0 ]; then

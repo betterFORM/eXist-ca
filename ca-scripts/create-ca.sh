@@ -89,7 +89,7 @@ fi
 ### validate user provided input data
 
 # cleanup obscure chars out of passed CA name, for use as file name
-THIS_CA=`echo -n "$EXISTCA_CANAME" | tr -cd '[:alnum:]'`
+THIS_CA=`echo "$EXISTCA_CANAME" | tr -cd '[:alnum:]'`
 
 # verify keysize user input
 if ! verify_rsakeysize $EXISTCA_CAKEYSIZE; then

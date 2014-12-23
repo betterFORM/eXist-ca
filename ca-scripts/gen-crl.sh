@@ -17,9 +17,9 @@ REQ_ENV="\
 #FAKE="echo"
 #DEBUG=1
 if [ -n "$DEBUG" ]; then
-    echo -n "cmdline: "
+    echo "cmdline: "
     echo $*
-    echo -n "pwd: "
+    echo "pwd: "
     pwd
     echo "environment:"
     env
@@ -42,7 +42,7 @@ fi
 err=0
 
 # cleanup obscure chars out of passed CA name, for use as file name
-THIS_CA=`echo -n "$EXISTCA_CANAME" | tr -cd '[:alnum:]'`
+THIS_CA=`echo "$EXISTCA_CANAME" | tr -cd '[:alnum:]'`
 
 # define EASYRSA_PKI to point to $THIS_CA directory
 export EASYRSA_PKI=${PKI_BASE}/${THIS_CA}
