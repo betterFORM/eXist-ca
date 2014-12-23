@@ -46,9 +46,9 @@ fi
 ### validate user provided input data
 
 # cleanup obscure chars out of passed Common Name, for use as file name
-SRV1=`echo -n "$NTP_SRV1" | tr -cd '[:alnum:].-'`
-SRV2=`echo -n "$NTP_SRV2" | tr -cd '[:alnum:].-'`
-SRV3=`echo -n "$NTP_SRV3" | tr -cd '[:alnum:].-'`
+SRV1=`echo "$NTP_SRV1" | tr -cd '[:alnum:].-'`
+SRV2=`echo "$NTP_SRV2" | tr -cd '[:alnum:].-'`
+SRV3=`echo "$NTP_SRV3" | tr -cd '[:alnum:].-'`
 
 # err out with exit code 1 (parameter problem)
 if [ $err -ne 0 ]; then

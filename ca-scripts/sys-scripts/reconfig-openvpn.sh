@@ -38,13 +38,13 @@ OPENVPN_DIR=/etc/openvpn
 ### validate user provided input data
 
 # cleanup obscure chars out of passed CA name, for use as file name
-THIS_VPN=`echo -n "$OPENVPN_VPNNAME" | tr -cd '[:alnum:]'`
+THIS_VPN=`echo "$OPENVPN_VPNNAME" | tr -cd '[:alnum:]'`
 
 # cleanup obscure chars out of passed CA name, for use as file name
-THIS_CA=`echo -n "$OPENVPN_CANAME" | tr -cd '[:alnum:]'`
+THIS_CA=`echo "$OPENVPN_CANAME" | tr -cd '[:alnum:]'`
 
 # cleanup obscure chars out of passed Common Name, for use as file name
-THIS_SRV=`echo -n "$OPENVPN_DNSNAME" | tr -cd '[:alnum:].-'`
+THIS_SRV=`echo "$OPENVPN_DNSNAME" | tr -cd '[:alnum:].-'`
 
 CERT_SRC=$PKI_BASE/$THIS_CA
 
