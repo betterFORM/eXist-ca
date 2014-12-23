@@ -8,29 +8,29 @@ Sample data
     <!-- system config data if running on an appliance, eg network config -->
     <appliance>
         <netconf>
-	    <hostname>exist.example.org</hostname>
-	    <interface name="eth0">
-	        <dhcp>yes</dhcp>
-	        <ip-v4-address></ip-v4-address>
-	        <ip-v4-netmask></ip-v4-netmask>
-	        <ip-v4-gateway></ip-v4-gateway>
-	        <dns1>8.8.8.8</dns1>
-	        <dns2>8.8.4.4</dns2>
-	        <dns3></dns3>
-	    </interface>
+            <hostname>exist.example.org</hostname>
+            <interface name="eth0">
+                <dhcp>yes</dhcp>
+                <ip-v4-address/>
+                <ip-v4-netmask/>
+                <ip-v4-gateway/>
+                <dns1>8.8.8.8</dns1>
+                <dns2>8.8.4.4</dns2>
+                <dns3/>
+            </interface>
         </netconf>
-	<subsystems>
-	    <subsys name="ntp">
-	        <ntp1>ntp1.ptb.de</ntp1>
-	        <ntp2>ntp2.ptb.de</ntp2>
-	        <ntp3>ntp3.ptb.de</ntp3>
-	    </subsys>
-	    <subsys name="openvpn">
-	        <port>1194</port>
-		<protocol>udp</protocol>
+        <subsystems>
+            <subsys name="ntp">
+                <ntp1>ntp1.ptb.de</ntp1>
+                <ntp2>ntp2.ptb.de</ntp2>
+                <ntp3>ntp3.ptb.de</ntp3>
+            </subsys>
+            <subsys name="openvpn">
+                <port>1194</port>
+                <protocol>udp</protocol>
 		<!-- ... -->
-	    </subsys>
-	</subsystems>
+            </subsys>
+        </subsystems>
     </appliance>
 
   <!-- container for all CAs -->
@@ -40,7 +40,7 @@ Sample data
             <expire/>
             <capass/>
             <expiry-date/>
-	    <dnsname/>
+            <dnsname/>
             <country/>
             <province/>
             <city/>
@@ -52,12 +52,12 @@ Sample data
             <certs>
                 <cert name="" nicename="">
                     <certtype/>
-		    <keysize/>
-		    <expire/>
+                    <keysize/>
+                    <expire/>
                     <status/>
                     <expire-timestamp/>
                     <serial/>
-		    <expiry-date/>
+                    <expiry-date/>
                     <certpass/>
                     <country/>
                     <province/>

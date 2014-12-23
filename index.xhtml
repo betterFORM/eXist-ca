@@ -11,42 +11,51 @@
         <div style="display:none;">
             <xf:model id="m-ca">
                 <xf:instance xmlns="" id="i-default">
-                    <CA id="" name="">
+                    <CA name="" nicename="">
                         <keysize/>
                         <expire/>
-                        <servername/>
                         <capass/>
-                        <expiry-date/> 
-                        <!-- <ca-cert-txt/> -->
+                        <expiry-date/>
+                        <dnsname/>
                         <country/>
                         <province/>
                         <city/>
                         <org/>
                         <org-unit/>
                         <email/>
+                        <cacert/>
+                        <cakey/>
                         <pending-requests>
                             <req name="" type=""/>
                         </pending-requests>
                         <rejected-requests>
                             <req name="" type="" rej-reason=""/>
                         </rejected-requests>
-                        <!-- valid | requested | expired | revoked -->
-                        <status>valid</status>
                     </CA>
                 </xf:instance>
                 <xf:bind ref="instance('i-default')">
                     <xf:bind ref="@name" required="true()"/>
+                    <xf:bind ref="dnsname" required="true()"/>
                     <xf:bind ref="keysize" required="true()"/>
                     <xf:bind ref="expire" required="true()" type="xf:integer"/>
                     <xf:bind ref="capass" required="true()"/>
                     <xf:bind ref="expiry-date"/>
                 </xf:bind>
-                <xf:submission id="s-createCA" method="post" replace="none" resource="modules/create-ca.xql">
+                <xf:submission id="s-createCA" ref="instance('i-default')" method="post" replace="instance" contentType="text/xml" resource="{$contextPath}/modules/create-ca.xql">
                     <xf:action ev:event="xforms-submit-error">
-                        <xf:message level="ephemeral">Something went terribly wrong</xf:message>
+                        <xf:message level="ephemeral">An Error occurred during creation of Trust Center</xf:message>
                     </xf:action>
                     <xf:action ev:event="xforms-submit-done">
-                        <xf:message level="ephemeral">Root certificate successfully created</xf:message>
+                        <xf:message level="ephemeral">Trust Center successfully created</xf:message>
+                        <xf:send submission="s-create-cert"/>
+                    </xf:action>
+                </xf:submission>
+                <xf:submission id="s-create-cert" ref="instance('i-default')" method="post" replace="instance" contentType="text/xml" resource="{$contextPath}/modules/create-cert.xql">
+                    <xf:action ev:event="xforms-submit-error">
+                        <xf:message level="ephemeral">An Error occurred during creation of cert for your server '<xf:output ref="dnsname"/>'</xf:message>
+                    </xf:action>
+                    <xf:action ev:event="xforms-submit-done">
+                        <xf:message level="ephemeral">Server Cert for '<xf:output ref="dnsname"/>' successfully created</xf:message>
                         <xf:toggle case="home"/>
                     </xf:action>
                 </xf:submission>
@@ -183,7 +192,7 @@
                     </script>
                 </xf:action>
                 <i id="reload" class="fa fa-rotate-left btn"/>
-                <h3>Your Certificate Authority</h3>
+                <h3>Setup your Trust Center</h3>
                 <xf:group id="summary" appearance="minimal">
                     <img src="resources/images/gray-cert-light.png"/>
                     <div class="cert-text">
@@ -210,7 +219,7 @@
                     <ul>
                         <li class="name-item">
                             <xf:input id="ca-name" ref="@name" class="-form-control" autofocus="autofocus">
-                                <xf:label>CA Name</xf:label>
+                                <xf:label>Name</xf:label>
                                 <xf:action ev:event="xforms-value-changed">
                                     <script>
                                         $(".name-item &gt; input").addClass("fadeOutUp animated");
@@ -368,7 +377,7 @@
                             access to your encrypted data - bla </div>
                         </li>
                         <li class="server-item hidden">
-                            <xf:input ref="servername" class="-form-control hidden">
+                            <xf:input ref="dnsname" class="-form-control hidden">
                                 <xf:label>Hostname</xf:label>
                                 <xf:hint>existca.example.org</xf:hint>
                                 <xf:action ev:event="xforms-value-changed">
@@ -468,21 +477,6 @@
                 </xf:group>
             </xf:case>
         </xf:switch>
-
-<!--
-    default to 4096 for strongest security
--->
-<!--            <ul>-->
-<!--                <li/>-->
-<!--                <li/>-->
-<!--                <li/>-->
-<!--            </ul>-->
-
-<!--        <menu type="toolbar">-->
-<!--            <button id="create">Create</button>-->
-<!--            <button id="renew" disabled="disabled">Renew</button>-->
-<!--            <button id="revoke" disabled="disabled">Revoke</button>-->
-<!--        </menu>-->
         <script type="text/javascript" src="resources/scripts/jquery.min.js"/>
         <script>
         $(document).ready(function() {

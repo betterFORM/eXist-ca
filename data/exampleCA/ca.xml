@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CA name="myname" nicename="" servername="example.org">
+    <keysize>4096</keysize>
+    <expire>1825</expire>
+    <capass>aaa</capass>
+    <expiry-date/>
+    <country/>
+    <province/>
+    <city/>
+    <org/>
+    <org-unit/>
+    <email/>
+    <cacert/>
+    <cakey/>
+    <pending-requests>
+        <req name="" type=""/>
+    </pending-requests>
+    <rejected-requests>
+        <req name="" type="" rej-reason=""/>
+    </rejected-requests>
+</CA>
