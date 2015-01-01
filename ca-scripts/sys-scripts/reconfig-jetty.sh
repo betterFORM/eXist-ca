@@ -43,24 +43,59 @@ err=0
 # env sanity checks
 if ! checkenv $REQ_ENV; then
     logmsg "ERROR - refuse to work on incomplete data"
-    exit 1
+    err=1
 fi
 
 # caller is expected to set the environment var SERVER_P12 to point to a 
 # PKCS#12 encoded server certificate 
 if [ ! -f "$SERVER_P12" ]; then
     logmsg "server cert PKCS12 file not found"
-    exit 1
+    err=1
 fi
 
 # verify jetty port value is postive integer
 if ! verify_posint $JETTY_PORT; then
     logmsg "ERROR - invalid $JETTY_PORT"
+    err=1
+fi
+
+# err out with exit code 1 (parameter problem)
+if [ $err -ne 0 ]; then
+    logmsg "ERROR reconfig jetty: parameter problem"
+    #printf "<XXX/>"
     exit 1
 fi
 
 
+# backup jetty config files as shipped with eXist (once, on first script run)
+backup_orig_files () {
+    if [ ! -f ${JETTY_HOME}/etc/jetty.xml.ORIG ]; then
+	logmsg "keeping copy of original jetty.xml"
+	cp -p ${JETTY_HOME}/etc/jetty.xml ${JETTY_HOME}/etc/jetty.xml.ORIG
+    fi
+    if [ ! -f ${JETTY_HOME}/etc/webdefault.xml.ORIG ]; then
+	logmsg "keeping copy of original webdefault.xml"
+	cp -p ${JETTY_HOME}/etc/webdefault.xml ${JETTY_HOME}/etc/webdefault.xml.ORIG
+    fi
+    if [ ! -f ${JETTY_HOME}/etc/keystore.ORIG ]; then
+	logmsg "keeping copy of original keystore"
+	cp -p ${JETTY_HOME}/etc/keystore ${JETTY_HOME}/etc/keystore.ORIG
+    fi
+}
+
+# restore original jetty config files as shipped with eXist
+restore_orig_files () {
+    logmsg "restoring original jetty config files"
+    cp -p ${JETTY_HOME}/etc/jetty.xml.ORIG ${JETTY_HOME}/etc/jetty.xml
+    cp -p ${JETTY_HOME}/etc/webdefault.xml.ORIG ${JETTY_HOME}/etc/webdefault.xml
+    cp -p ${JETTY_HOME}/etc/keystore.ORIG ${JETTY_HOME}/etc/keystore
+}
+
+
 JETTY_SAMPLES=$EXISTCA_HOME/sys-scripts/jetty-samples
+
+backup_orig_files
+
 
 ### setup jetty keystore
 
@@ -112,6 +147,7 @@ fi
 # err out with exit code 2 (jetty keystore)
 if [ $err -ne 0 ]; then
     logmsg "ERROR setting up jetty keystore"
+    restore_orig_files
     exit 2
 fi
 
@@ -141,20 +177,14 @@ fi
 # err out with exit code 3 (jetty config)
 if [ $err -ne 0 ]; then
     logmsg "ERROR configuring jetty"
+    restore_orig_files
     exit 3
 fi
 
 
 ### check/fix hostname/network config to match web server name
 
-#$FAKE sh $EXISTCA_HOME/reconfig-net.sh
-#if [ $? -ne 0 ]; then
-#    logmsg "ERROR - failed to reconfig network"
-#    # err out with exit code 5 (network reconfig)
-#    exit 5
-#fi
-
-# restart exist
+### restart exist
 #$FAKE /etc/rc.d/exist restart
 
 
