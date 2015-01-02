@@ -18,6 +18,7 @@
 #   2  - fail: jetty keystore setup
 #   3  - fail: jetty configuration
 
+[ -n "$DEBUG" ] && set -x
 
 # required env vars as documented above
 export REQ_ENV="\

@@ -57,6 +57,7 @@ let $create-ca-options :=
            <env name="EXISTCA_XMLOUT" value="{$cert-tmp}"/>
            <env name="EXISTCA_HOME" value="{$ca-home}"/>
            <env name="PKI_BASE" value="{$pki-home}"/>
+           <env name="DEBUG" value=""/>
        </environment>
    </options>
  
@@ -104,6 +105,7 @@ let $create-cert-options :=
            <env name="EXISTCA_HOME" value="{$ca-home}"/>
            <env name="EXISTCA_XMLOUT" value="{$cert-tmp}"/>
            <env name="PKI_BASE" value="{$pki-home}"/>
+           <env name="DEBUG" value=""/>
        </environment>
    </options>
 
@@ -135,10 +137,11 @@ let $reconf-jetty-options :=
            <env name="JETTY_PORT" value="{environment-variable("JETTY_PORT")}"/>
            <env name="EXISTCA_HOME" value="{$ca-home}"/>
            <env name="EXISTCA_CERTPASS" value="{$data/capass}"/>
+           <env name="DEBUG" value=""/>
        </environment>
    </options>
  
-let $result := (process:execute(("sh", "sys-sccripts/reconfig-jetty.sh"), $reconf-jetty-options))
+let $result := (process:execute(("sh", "sys-scripts/reconfig-jetty.sh"), $reconf-jetty-options))
 
 
 :)
