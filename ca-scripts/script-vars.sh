@@ -35,7 +35,7 @@ verify_rsakeysize () {
 # verify that arg is a positive integer
 verify_posint () {
     i=$1
-    [[ $i -gt 0 ]] || ( logmsg "expire not positive int $i"; return 1 )
+    [[ $i -gt 0 ]] || ( logmsg "not a positive int $i"; return 1 )
 }
 
 # verify cert type
