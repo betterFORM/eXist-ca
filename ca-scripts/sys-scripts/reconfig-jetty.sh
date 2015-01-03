@@ -50,7 +50,7 @@ fi
 # caller is expected to set the environment var SERVER_P12 to point to a 
 # PKCS#12 encoded server certificate 
 if [ ! -f "$SERVER_P12" ]; then
-    logmsg "server cert PKCS12 file not found"
+    logmsg "server cert PKCS12 file \"$SERVER_P12\" not found"
     err=1
 fi
 
