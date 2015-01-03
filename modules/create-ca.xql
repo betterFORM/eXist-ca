@@ -54,6 +54,7 @@ let $create-ca-options :=
            <env name="EXISTCA_CAORG" value="{$data//org}"/>
            <env name="EXISTCA_CAOU" value="{$data//org-unit}"/>
            <env name="EXISTCA_CAEMAIL" value="{$data//email}"/>
+           <env name="EXISTCA_CASRVNAME" value="{$data//dnsname}"/>
            <env name="EXISTCA_XMLOUT" value="{$cert-tmp}"/>
            <env name="EXISTCA_HOME" value="{$ca-home}"/>
            <env name="PKI_BASE" value="{$pki-home}"/>

@@ -19,6 +19,7 @@
 #   EXISTCA_CAORG       (eg "Example Org")
 #   EXISTCA_CAOU        (eg "CA")
 #   EXISTCA_CAEMAIL     (eg "ca@example.org")
+#   EXISTCA_CASRVNAME   (eg "ca.example.org")
 #   EXISTCA_HOME        (eg /usr/local/eXistCA)
 #   EXISTCA XMLOUT
 #   PKI_BASE
@@ -42,6 +43,7 @@ REQ_ENV="\
  EXISTCA_CAORG \
  EXISTCA_CAOU \
  EXISTCA_CAEMAIL \
+ EXISTCA_CASRVNAME \
  EXISTCA_HOME \
  EXISTCA_XMLOUT \
  PKI_BASE \
@@ -64,7 +66,7 @@ dump_xml () {
   <cakey>$ca_key</cakey>
   <current-serial>$ca_serial</current-serial>
   <expiry-date>$exp_date</expiry-date>
-  <dnsname/>
+  <dnsname>$THIS_SRV</dnsname>
   <country>$EXISTCA_CACOUNTRY</country>
   <province>$EXISTCA_CAPROVINCE</province>
   <city>$EXISTCA_CACITY</city>
@@ -91,6 +93,9 @@ fi
 
 # cleanup obscure chars out of passed CA name, for use as file name
 THIS_CA=`echo "$EXISTCA_CANAME" | tr -cd '[:alnum:]'`
+
+# cleanup obscure chars out of passed server DNS name, for use as file name
+THIS_SRV=`echo "$EXISTCA_CASRVNAME" | tr -cd '[:alnum:].-'`
 
 # verify keysize user input
 if ! verify_rsakeysize $EXISTCA_CAKEYSIZE; then
