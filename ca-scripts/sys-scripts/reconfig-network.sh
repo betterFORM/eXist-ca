@@ -12,6 +12,7 @@
 #   1  - fail: parameter problem
 #   2  - fail: cert creation
 
+[ -n "$DEBUG" ] && set -x
 
 # required env vars as documented above
 REQ_ENV="\

@@ -23,6 +23,8 @@
 #   1  - fail: parameter problem
 #   2  - fail: cert request creation
 
+[ -n "$DEBUG" ] && set -x
+
 # required env vars as documented above
 export REQ_ENV="\
  EXISTCA_CANAME \

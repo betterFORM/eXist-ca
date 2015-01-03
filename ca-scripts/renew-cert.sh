@@ -18,6 +18,7 @@
 #   1  - fail: parameter problem
 #   2  - fail: 
 
+[ -n "$DEBUG" ] && set -x
 
 # required env vars as documented above
 REQ_ENV="\

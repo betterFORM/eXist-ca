@@ -13,6 +13,7 @@
 #   0  - success
 #   1  - fail: parameter problem
 
+[ -n "$DEBUG" ] && set -x
 
 # required env vars as documented above
 export REQ_ENV="\

@@ -13,6 +13,7 @@
 #   1  - fail: parameter problem
 #   2  - fail: reconfig ntp
 
+[ -n "$DEBUG" ] && set -x
 
 # required env vars as documented above
 export REQ_ENV="\
@@ -62,8 +63,7 @@ fi
 # this function is defined in $OS/os-common.sh
 $FAKE reconfig_ntpd $SRV1 $SRV2 $SRV3
 
-ret=$?
-if [ $ret -ne 0 ]; then
+if [ $? -ne 0 ]; then
     logmsg "ERROR - reconfiguring ntpd"
     exit 2
 fi

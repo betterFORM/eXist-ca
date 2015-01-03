@@ -17,6 +17,8 @@
 #   1  - fail: parameter problem
 #   2  - fail: sign cert
 
+[ -n "$DEBUG" ] && set -x
+
 # required env vars as documented above
 REQ_ENV="\
  EXISTCA_CAPASS \

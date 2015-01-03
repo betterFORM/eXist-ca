@@ -15,6 +15,8 @@
 #   1  - fail: parameter problem
 #   2  - fail: 
 
+[ -n "$DEBUG" ] && set -x
+
 # required env vars as documented above
 export REQ_ENV="\
  EXISTCA_CAPASS \
