@@ -47,6 +47,13 @@ verify_certtype () {
     esac
 }
 
+# verify that arg is a positive integer
+# XXX FAKE for now
+verify_ipaddr () {
+    i=$1
+    [[ -n "$i" ]] || ( logmsg "(FAKE) not an IP address $i"; return 1 )
+}
+
 
 # PKCS12 export password
 #export EXISTCA_EXPORTPASS=export
