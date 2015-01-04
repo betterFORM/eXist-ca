@@ -14,6 +14,7 @@
 #   OPENVPN_CIPHER
 #   OPENVPN_DNSNAME
 #   PKI_BASE
+#   APPLIANCE_HOME
 #
 # This script returns the following exit codes:
 #   0  - success
@@ -34,12 +35,24 @@ export REQ_ENV="\
  OPENVPN_CIPHER \
  OPENVPN_DNSNAME \
  PKI_BASE \
+ APPLIANCE_HOME \
 "
 
 #FAKE=echo
 
-# source common script vars
-. $EXISTCA_HOME/script-vars.sh
+err=0
+
+# source common script vars (generic, not OS specific vars and functions)
+. $APPLIANCE_HOME/common.sh
+
+OSDIR=`determine_osdir`
+if [ -n "$OSDIR" ]; then
+    logmsg "ERROR - can not determine OS"
+    err=1
+else
+    # source common script vars (OS specific vars and functions)
+    . $APPLIANCE_HOME/$OSDIR/os-common.sh
+fi
 
 # env sanity checks
 if ! checkenv $REQ_ENV; then
@@ -47,7 +60,6 @@ if ! checkenv $REQ_ENV; then
     exit 1
 fi
 
-OPENVPN_DIR=/etc/openvpn
 
 ### validate user provided input data
 
@@ -108,28 +120,47 @@ mkdir -p $OPENVPN_DIR/$THIS_VPN
 # copy ca cert, server key and cert, and DH parameters
 install -m 644 \
   $CERT_SRC/ca.crt \
-  $CERT_SRC/dh*.pem \
+  $CERT_SRC/dh4096.pem \
   $CERT_SRC/issued/${THIS_SRV}.crt \
   $OPENVPN_DIR/$THIS_VPN/ || err=1
 install -m 600 \
   $CERT_SRC/private/${THIS_SRV}.key \
   $OPENVPN_DIR/$THIS_VPN/ || err=1
 
+openvpn --genkey --secret $OPENVPN_DIR/$THIS_VPN/ta.key || err=1
+
 # copy and modify openvpn config
 #cp openvpn-samples/server.conf $OPENVPN_DIR/${THIS_VPN}.conf
 sed -e "\
- s|daemon openvpn.INSTANCE|daemon openvpn.${THIS_VPN}|;\
+ s|INSTANCE|${THIS_VPN}|;\
  s|dev DEVICE|dev ${DEVICE}|;\
  s|local SRVADDR|local $(OPENVPN_SRVADDR}|;\
  s|port SRVPORT|port $(OPENVPN_SRVPORT}|;\
  s|proto SRVPORT|proto $(OPENVPN_SRVPROTO}|;\
  s|server NETWORK NETMASK|server $(OPENVPN_NETWORK} $(OPENVPN_NETMASK}|;\
- s|ca CACERT|ca ${CERT_SRC}/ca.crt|;\
- s|cert SRVCERT|cert ${CERT_SRC}/issued/${THIS_SRV}.crt|;\
- s|key SRVKEY|key ${CERT_SRC}/private/${THIS_SRV}.key|;\
- s|dh DH|dh ${CERT_SRC}/dh2048.pem|;\
+ s|ca CACERT|ca $OPENVPN_DIR/$THIS_VPN/ca.crt|;\
+ s|cert SRVCERT|cert $OPENVPN_DIR/$THIS_VPN/${THIS_SRV}.crt|;\
+ s|key SRVKEY|key $OPENVPN_DIR/$THIS_VPN/${THIS_SRV}.key|;\
+ s|dh DH|dh $OPENVPN_DIR/$THIS_VPN/dh4096.pem|;\
+ s|crl-verify CACRL|crl-verify $OPENVPN_DIR/$THIS_VPN/crl.pem|;\
+ s|tls-auth ta.key|tls-auth $OPENVPN_DIR/$THIS_VPN/ta.key|;\
  s|cipher CIPHER|cipher $(OPENVPN_CIPHER}|;\
+ s|user USER|user $(OPENVPN_USER}|;\
+ s|group GROUP|group $(OPENVPN_GROUP}|;\
+ s|chroot CHROOT|chroot $(OPENVPN_CHROOT}|;\
 " <openvpn-samples/server.conf >$OPENVPN_DIR/${THIS_VPN}.conf || err=1
+
+# example client config file for this VPN
+#cp openvpn-samples/client.conf $OPENVPN_DIR/${THIS_VPN}-client.ovpn
+sed -e "\
+ s|dev-node INSTANCE|dev-node ${THIS_VPN}|;\
+ s|port SRVPORT|port $(OPENVPN_SRVPORT}|;\
+ s|proto SRVPORT|proto $(OPENVPN_SRVPROTO}|;\
+ s|server NETWORK NETMASK|server $(OPENVPN_NETWORK} $(OPENVPN_NETMASK}|;\
+ s|pkcs12 SRVP12|key client.p12|;\
+ s|tls-auth ta.key|tls-auth ta.key|;\
+ s|cipher CIPHER|cipher $(OPENVPN_CIPHER}|;\
+" <openvpn-samples/client.conf >$OPENVPN_DIR/${THIS_VPN}-client.ovpn || err=1
 
 # err out with exit code 2 (OpenVPN config)
 if [ $err -ne 0 ]; then
