@@ -1,9 +1,10 @@
 #!/bin/sh
 
-# modify jetty configuration
+# modify ntpd configuration
 #
 # The following environment vars need to be passed from the caller 
 # (vars may have no value, but must be present in the environment):
+#   APPLIANCE_HOME
 #   NTP_SRV1
 #   NTP_SRV2
 #   NTP_SRV3
@@ -17,6 +18,7 @@
 
 # required env vars as documented above
 export REQ_ENV="\
+ APPLIANCE_HOME \
  NTP_SRV1 \
  NTP_SRV3 \
  NTP_SRV3 \
