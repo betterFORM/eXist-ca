@@ -46,18 +46,18 @@ reconfig_ntpd () {
     file=/etc/ntpd.conf
     # keep backup of original config file when run the first time
     [ -f "$file" -a ! -f "$file.ORIG" ] && cp -p $file $file.ORIG
-    err=$?
+    [ $? -ne 0 ] && err=1
     # backup config file everytime we attempt to modify it
     bak="$file.`mkbackuptimestamp`"
     [ -f "$file" ] && cp -p $file $bak && ln -sf $bak $file.LAST
-    err=$?
+    [ $? -ne 0 ] && err=1
 
     echo "listen on *" >$file
     for s in $srvs; do
 	logmsg "adding NTP server $s"
 	echo "server $s" >>$file
     done
-    err=$?
+    [ $? -ne 0 ] && err=1
 
     ntpd -nf $file || err=1
 
