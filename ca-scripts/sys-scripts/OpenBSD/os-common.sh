@@ -7,6 +7,20 @@ OPENVPN_GROUP=_openvpn
 OPENVPN_CHROOT=/var/empty
 
 
+### functions for installation and setup
+
+install_pkg () {
+    pkg=$1
+    case "$pkg" in
+	java)
+	    pkg=jre
+	    ;;
+	*) :;;
+    esac
+    pkg_add $pkg
+}
+
+
 ### functions for network configuration
 
 # check if interface is already configured for DHCP
