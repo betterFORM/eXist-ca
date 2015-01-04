@@ -3,6 +3,12 @@
 # Debian network config file
 INTERFACES=/etc/network/interfaces
 
+# vars for OpenVPN on Debian
+OPENVPN_DIR=/etc/openvpn
+OPENVPN_USER=nobody
+OPENVPN_GROUP=nogroup
+OPENVPN_CHROOT=
+
 
 ### functions for network configuration
 
@@ -36,14 +42,28 @@ reconfig_if () {
 reconfig_ntpd () {
     srvs=$*
     file=/etc/ntp.conf
+    # keep backup of original config file when run the first time
+    [ -f "$file" -a ! -f "$file.ORIG" ] && cp -p $file $file.ORIG
+    [ $? -ne 0 ] && err=1
+    # backup config file everytime we attempt to modify it
     bak="$file.`mkbackuptimestamp`"
-    [ -f "$file" ] && cp -p $file $bak
+    [ -f "$file" ] && cp -p $file $bak && ln -sf $bak $file.LAST
+    [ $? -ne 0 ] && err=1
 
     for s in $srvs; do
 	logmsg "adding NTP server $s"
 	SEDOUT="server $s\n"
     done
     sed -e "s/%SERVERDEFS%/$SEDOUT/;" <Debian/sample-ntp.conf >$file
+    [ $? -ne 0 ] && err=1
+
+    if [ $err -ne 0 ]; then
+	logmsg "failed to reconfig ntpd, trying to restore backup"
+	cp -p $file.LAST $file
+	return 1
+    fi
+
+    return 0
 }
 
 # restart ntp daemon

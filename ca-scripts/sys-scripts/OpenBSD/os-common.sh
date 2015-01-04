@@ -1,5 +1,11 @@
 #!/bin/sh 
 
+# vars for OpenVPN on OpenBSD
+OPENVPN_DIR=/etc/openvpn
+OPENVPN_USER=_openvpn
+OPENVPN_GROUP=_openvpn
+OPENVPN_CHROOT=/var/empty
+
 
 ### functions for network configuration
 
@@ -36,15 +42,32 @@ reconfig_if () {
 # rebuild ntpd.conf
 reconfig_ntpd () {
     srvs=$*
+    err=0
     file=/etc/ntpd.conf
+    # keep backup of original config file when run the first time
+    [ -f "$file" -a ! -f "$file.ORIG" ] && cp -p $file $file.ORIG
+    err=$?
+    # backup config file everytime we attempt to modify it
     bak="$file.`mkbackuptimestamp`"
-    [ -f "$file" ] && cp -p $file $bak
+    [ -f "$file" ] && cp -p $file $bak && ln -sf $bak $file.LAST
+    err=$?
 
     echo "listen on *" >$file
     for s in $srvs; do
 	logmsg "adding NTP server $s"
 	echo "server $s" >>$file
     done
+    err=$?
+
+    ntpd -nf $file || err=1
+
+    if [ $err -ne 0 ]; then
+	logmsg "failed to reconfig ntpd, trying to restore backup"
+	cp -p $file.LAST $file
+	return 1
+    fi
+
+    return 0
 }
 
 # restart ntp daemon
@@ -61,7 +84,7 @@ restart_ntpd () {
 }
 
 
-### functions for NTP configuration
+### functions for OpenVPN configuration
 
 # restart OpenVPN daemon
 restart_openvpn () {
