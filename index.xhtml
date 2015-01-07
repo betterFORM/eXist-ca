@@ -68,8 +68,14 @@
                         <xf:toggle case="home"/>
                     </xf:action>
                 </xf:submission>
-                
-<!--                <xf:instance id="i-CAs" xmlns="" src="data/getCAs.xql"/>-->
+                <xf:instance xmlns="" id="i-cas">
+                    <data/>
+                </xf:instance>
+                <xf:submission id="s-load-cas" resource="modules/get-ca.xql" method="get" replace="instance" ref="instance('i-cas')"/>
+                <xf:instance xmlns="" id="i-certs">
+                    <certs/>
+                </xf:instance>
+                <xf:submission id="s-load-certs" resource="modules/list-certs.xql" method="get" replace="instance" ref="instance('i-certs')"/>
                 <xf:instance xmlns="" id="i-vars">
                     <data>
                         <retype/>
@@ -79,14 +85,16 @@
                 <xf:bind ref="instance('i-vars')">
                     <xf:bind ref="retype" constraint=". eq instance('i-default')/capass" required="true()"/>
                 </xf:bind>
+    
+
+                
+                <!-- ### the following is not used yet ###
                 <xf:instance xmlns="" id="i-countries" src="data/countries.xml"/>
-                <xf:instance xmlns="" id="i-CAs">
-                    <data/>
-                </xf:instance>
-                <xf:submission id="s-load-cas" resource="modules/get-ca.xql" method="get" replace="instance" ref="instance('i-CAs')"/>
+                -->
                 <xf:action ev:event="xforms-ready">
                     <xf:send submission="s-load-cas"/>
-                    <xf:toggle case="create-ca" if="not(exists(instance('i-CAs')/CA))"/>
+                    <xf:send submission="s-load-certs"/>
+                    <xf:toggle case="create-ca" if="not(exists(instance('i-cas')/CA))"/>
                 </xf:action>
             </xf:model>
         </div>
@@ -123,7 +131,7 @@
             <xf:case id="CA-home">
                 <h2>Your trustchains</h2>
                 <!--
-                <xf:repeat ref="CAs/CA" appearance="minimal">
+                <xf:repeat ref="cas/CA" appearance="minimal">
                     <xf:output ref="@name" class="ca-name">
                         <xf:label/>
                     </xf:output>
@@ -148,6 +156,19 @@
                     </script>
                 </xf:action>
                 <h3>All Certificates</h3>
+                <xf:repeat ref="instance('i-certs')/cert" appearance="compact" class="table table-hover cert-list">
+                    <xf:output ref="@name">
+                        <xf:label>Name</xf:label>
+                    </xf:output>
+                    <xf:output ref="expiry-date">
+                        <xf:label>Expires</xf:label>
+                    </xf:output>
+                    <xf:output ref="status">
+                        <xf:label>
+                            <i class="fa fa-lock fa-lg active"/>
+                        </xf:label>
+                    </xf:output>
+                </xf:repeat>
                 <table class="table table-hover cert-list ">
                     <thead>
                         <tr>
@@ -436,7 +457,7 @@
                 <h1>Cert Details</h1>
             </xf:case>
             <xf:case id="expert">
-                <xf:group appearance="full" ref="CAs/CA">
+                <xf:group appearance="full" ref="cas/CA">
                     <ul>
                         <li>
                             <xf:input ref="org">

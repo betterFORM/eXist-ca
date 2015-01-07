@@ -1,0 +1,541 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--+
+    | Configuration file for the web application.
+    |
+    | The URL mapping for rest, xmlrpc, soap etc are handled now by the
+    | XQueryURLRewrite servlet filter. See for details below.
+    |
+    | $Id: web.xml 14172 2011-04-12 09:49:26Z deliriumsky $
+    +-->
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" version="2.4">
+    <description>eXist Open Source Native XML Database</description>
+    <display-name>eXist XML Database</display-name>
+    <!--====================== betterFORM configuration file ====================== -->
+    <context-param>
+        <param-name>betterform.configfile</param-name>
+        <param-value>WEB-INF/betterform-config.xml</param-value>
+    </context-param>
+
+    <!--
+	 | ScaleImageJAI servlet: scale images on the fly and cache
+	 | the output. Commented out by default.
+	 +-->
+    <!--
+    <servlet>
+        <servlet-name>ScaleImageJAI</servlet-name>
+        <servlet-class>org.exist.http.servlets.ScaleImageJAI</servlet-class>
+
+        <init-param>
+            <param-name>base</param-name>
+            <param-value>xmldb:exist:///db</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>output-dir</param-name>
+            <param-value>/home/wolf/images</param-value>
+        </init-param>
+    </servlet>
+    -->
+
+    <!--
+        Log4jInit initializes Log4j.
+        Only needed when eXist is deployed as a .war file in e.g. Tomcat.
+    -->
+    <servlet>
+        <servlet-name>log4j-init</servlet-name>
+        <servlet-class>org.exist.http.servlets.Log4jInit</servlet-class>
+        <init-param>
+            <param-name>log4j-init-file</param-name>
+            <param-value>WEB-INF/log4j.xml</param-value>
+        </init-param>
+        <init-param>
+            <param-name>log4j-log-dir</param-name>
+            <param-value>WEB-INF/logs</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <!--
+        RpcServlet provides XML-RPC access.
+    -->
+    <servlet>
+        <servlet-name>org.exist.xmlrpc.RpcServlet</servlet-name>
+        <servlet-class>org.exist.xmlrpc.RpcServlet</servlet-class>
+        <init-param>
+            <param-name>enabledForExtensions</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>useDefaultUser</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </servlet>
+
+    <!--
+        EXistServlet is a helper servlet that is used to ensure that
+        eXist is running in the background.
+        Set the start-parameter to true and load-on-startup a low value e.g. 2.
+    -->
+    <servlet>
+        <servlet-name>EXistServlet</servlet-name>
+        <servlet-class>org.exist.http.servlets.EXistServlet</servlet-class>
+
+        <!--
+            Location of eXist's configuration file relative to the basedir
+            of the web-application.
+        -->
+        <init-param>
+            <param-name>configuration</param-name>
+            <param-value>conf.xml</param-value>
+        </init-param>
+
+        <!--
+            eXist's home directory. All file names in the configuration file
+            will be relative to this directory.
+        -->
+        <init-param>
+            <param-name>basedir</param-name>
+            <param-value>WEB-INF/</param-value>
+        </init-param>
+        <init-param>
+            <param-name>start</param-name>
+            <param-value>true</param-value>
+        </init-param>
+
+        <!--
+			If parameter "hidden" is set to true, direct access to the
+			REST interface will be denied. Only requests coming from the
+			URL rewriting will be processed.
+
+			Rationale: on a production server, you may want to store the
+			application within the database, but without allowing users
+			to browse the database contents. By setting hidden=true, you
+			can expose defined URLs to the outside world via URL rewriting
+			while hiding the rest of the database.
+		-->
+        <init-param>
+            <param-name>hidden</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <load-on-startup>2</load-on-startup>
+    </servlet>
+
+    <!--
+        JMXservlet is a servlet to monitor the database. It returns status information
+        for the database based on the JMX interface.
+    -->
+    <servlet>
+        <servlet-name>JMXServlet</servlet-name>
+        <servlet-class>org.exist.management.client.JMXServlet</servlet-class>
+    </servlet>
+
+    <!--
+        Milton provides the WebDAV interface
+    -->
+    <servlet>
+        <servlet-name>milton</servlet-name>
+        <servlet-class>org.exist.webdav.MiltonWebDAVServlet</servlet-class>
+
+        <!-- Don't change this value -->
+        <init-param>
+            <param-name>resource.factory.class</param-name>
+            <param-value>org.exist.webdav.ExistResourceFactory</param-value>
+        </init-param>
+
+        <!--
+             Some WebDAV clients send a "Expect: 100-continue" header before
+             uploading body data. Servlet containers (like tomcat and jetty) handle
+             the header in a wrong way, making a client not work OK.
+             Set value to TRUE to restore old behavior (FALSE is the new default
+             value, hardcoded in MiltonWebDAVServlet).
+        -->
+        <!--
+        <init-param>
+            <param-name>enable.expect.continue</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        -->
+
+        <!-- Uncomment to enable debugging -->
+        <!--
+        <init-param>
+            <param-name>filter_0</param-name>
+            <param-value>com.bradmcevoy.http.DebugFilter</param-value>
+        </init-param>
+        -->
+    </servlet>
+
+    <!--
+        XQueryServlet generates HTML from an XQuery file.
+    -->
+    <servlet>
+        <servlet-name>XQueryServlet</servlet-name>
+        <servlet-class>org.exist.http.servlets.XQueryServlet</servlet-class>
+        <init-param>
+            <param-name>uri</param-name>
+            <param-value>xmldb:exist:///db</param-value>
+        </init-param>
+        <init-param>
+            <param-name>form-encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>container-encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+    </servlet>
+
+    <!--
+        XQueryURLRewrite, servlet filter for URL rewriting and redirection.
+    -->
+    <servlet>
+        <servlet-name>XQueryURLRewrite</servlet-name>
+        <servlet-class>org.exist.http.urlrewrite.XQueryURLRewrite</servlet-class>
+
+        <!-- Defines the location of the controller-config.xml file,
+             which defines the root mappings. -->
+        <init-param>
+            <param-name>config</param-name>
+            <param-value>WEB-INF/controller-config.xml</param-value>
+        </init-param>
+
+        <!-- The controller-config.xml file could also be stored inside the db: -->
+        <!--
+        <init-param>
+			<param-name>config</param-name>
+			<param-value>xmldb:exist:///db/controller-config.xml</param-value>
+		</init-param>
+        -->
+
+        <!--
+        <init-param>
+			<param-name>compiled-cache</param-name>
+			<param-value>false</param-value>
+		</init-param>
+        -->
+    </servlet>
+
+    <!--
+        XSLTServlet applies an XSLT transformation to its input stream.
+    -->
+    <servlet>
+        <servlet-name>XSLTServlet</servlet-name>
+        <servlet-class>org.exist.http.servlets.XSLTServlet</servlet-class>
+    </servlet>
+
+    <!--
+	<servlet>
+        <servlet-name>OAuthServlet</servlet-name>
+        <servlet-class>org.exist.security.realm.oauth.OAuthServlet</servlet-class>
+    </servlet>
+    -->
+
+    <!--
+        Axis provides SOAP access eXist's web-services.
+    -->
+    <servlet>
+        <servlet-name>AxisServlet</servlet-name>
+        <servlet-class>org.apache.axis.transport.http.AxisServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AdminServlet</servlet-name>
+        <servlet-class>org.apache.axis.transport.http.AdminServlet</servlet-class>
+        <load-on-startup>100</load-on-startup>
+    </servlet>
+
+    <!--
+        Atom Publishing Protocol.
+    -->
+    <servlet>
+        <servlet-name>AtomServlet</servlet-name>
+        <servlet-class>org.exist.atom.http.AtomServlet</servlet-class>
+    </servlet>
+
+    <!--
+        EXQuery - RESTXQ
+    -->
+    <servlet>
+        <servlet-name>RestXqServlet</servlet-name>
+        <servlet-class>org.exist.extensions.exquery.restxq.impl.RestXqServlet</servlet-class>
+    </servlet>
+
+    <!--
+        Webstart servlet, provides access to the java client.
+    -->
+    <servlet>
+        <servlet-name>jnlp</servlet-name>
+        <servlet-class>org.exist.webstart.JnlpServlet</servlet-class>
+    </servlet>
+    <!--====================== betterFORM filter and servlets ======================-->
+    <!--====================== betterFORM servlets ======================-->
+    <servlet>
+        <servlet-name>Flux</servlet-name>
+        <servlet-class>
+            org.directwebremoting.servlet.DwrServlet
+        </servlet-class>
+        <init-param>
+            <param-name>debug</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </servlet>
+    <servlet>
+        <servlet-name>XFormsPostServlet</servlet-name>
+        <servlet-class>
+            de.betterform.agent.web.servlet.XFormsPostServlet
+        </servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>FormsServlet</servlet-name>
+        <servlet-class>
+            de.betterform.agent.web.servlet.FormsServlet
+        </servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>inspector</servlet-name>
+        <servlet-class>
+            de.betterform.agent.web.servlet.XFormsInspectorServlet
+        </servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ResourceServlet</servlet-name>
+        <servlet-class>
+            de.betterform.agent.web.resources.ResourceServlet
+        </servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>error</servlet-name>
+        <servlet-class>de.betterform.agent.web.servlet.ErrorServlet</servlet-class>
+    </servlet>
+    <!--====================== betterFORM servlets mapping ======================-->
+    <servlet-mapping>
+        <servlet-name>Flux</servlet-name>
+        <url-pattern>/Flux/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>XFormsPostServlet</servlet-name>
+        <url-pattern>/XFormsPost</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>XQueryServlet</servlet-name>
+        <url-pattern>*.xql</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>FormsServlet</servlet-name>
+        <url-pattern>/forms/formslist</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>inspector</servlet-name>
+        <url-pattern>/inspector/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ResourceServlet</servlet-name>
+        <url-pattern>/bfResources/*</url-pattern>
+        <init-param>
+            <param-name>caching</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>error</servlet-name>
+        <url-pattern>/error/*</url-pattern>
+    </servlet-mapping>
+    <!--====================== betterFORM filter ======================-->
+    <filter>
+        <filter-name>XFormsFilter</filter-name>
+        <filter-class>
+            de.betterform.agent.web.filter.XFormsFilter
+        </filter-class>
+    </filter>
+    <!--====================== betterFORM filter mapping ======================-->
+    <filter-mapping>
+        <filter-name>XFormsFilter</filter-name>
+        <url-pattern>/apps/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>XFormsFilter</filter-name>
+        <servlet-name>XFormsPostServlet</servlet-name>
+    </filter-mapping>
+    <listener>
+        <listener-class>de.betterform.agent.web.servlet.BfServletContextListener</listener-class>
+    </listener>
+    <!--====================== betterFORM filter and servlets ======================-->
+
+
+
+    <!--
+        ====================== URL space mappings =======================
+    -->
+
+    <!--
+         IMPORTANT: the XQueryURLRewrite servlet filter does now serve as a single
+         entry point into the web application. All eXist-related URL  mappings are
+         handled by XQueryURLRewrite (see controller-config.xml).
+
+         The servlet mappings below are thus commented out. We keep them here
+         for documentation purposes. If you need to switch to the old setup,
+         you can re-enable the mappings below and disable them in controller-config.xml.
+
+         However, please note that some features of the website will only work if
+         XQueryURLRewrite controls the /rest servlet  (EXistServlet).
+    -->
+
+    <!-- XQuery URL rewriter -->
+    <servlet-mapping>
+        <servlet-name>XQueryURLRewrite</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- XMLRPC -->
+    <!--
+    <servlet-mapping>
+        <servlet-name>org.exist.xmlrpc.RpcServlet</servlet-name>
+        <url-pattern>/xmlrpc</url-pattern>
+    </servlet-mapping>
+    -->
+
+    <!-- REST -->
+    <!--
+    <servlet-mapping>
+        <servlet-name>EXistServlet</servlet-name>
+        <url-pattern>/rest/*</url-pattern>
+    </servlet-mapping>
+    -->
+
+    <!-- XQuery (Note: not for database stored queries) -->
+    <!--
+    <servlet-mapping>
+        <servlet-name>XQueryServlet</servlet-name>
+        <url-pattern>*.xql</url-pattern>
+    </servlet-mapping>
+    -->
+
+    <!-- SOAP (Apache Axis) -->
+    <!--
+    <servlet-mapping>
+        <servlet-name>AxisServlet</servlet-name>
+        <url-pattern>/axis-servlet/AxisServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>AxisServlet</servlet-name>
+        <url-pattern>*.jws</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>AxisServlet</servlet-name>
+        <url-pattern>/services/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>AdminServlet</servlet-name>
+        <url-pattern>/axis-servlet/AdminServlet</url-pattern>
+    </servlet-mapping>
+    -->
+
+    <!--
+        ==================== various MIME type mappings ==================
+    -->
+    <mime-mapping>
+        <extension>css</extension>
+        <mime-type>text/css</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>xml</extension>
+        <mime-type>application/xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>xsl</extension>
+        <mime-type>application/xml+xslt</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>xconf</extension>
+        <mime-type>application/xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>xmap</extension>
+        <mime-type>application/xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>ent</extension>
+        <mime-type>text/plain</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>grm</extension>
+        <mime-type>text/plain</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>cacert</extension>
+        <mime-type>application/x-x509-ca-cert</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>p12</extension>
+        <mime-type>application/x-pkcs12</mime-type>
+    </mime-mapping>
+
+
+    <!--
+    <jsp-config>
+        <taglib>
+            <taglib-uri>http://exist-db.org/exist</taglib-uri>
+            <taglib-location>/WEB-INF/exist.tld</taglib-location>
+        </taglib>
+    </jsp-config>
+    -->
+    <login-config>
+        <auth-method>FORM</auth-method>
+        <realm-name>JAASLoginService</realm-name>
+        <form-login-config>
+            <form-login-page>/login/login</form-login-page>
+            <form-error-page>/login/error</form-error-page>
+        </form-login-config>
+    </login-config>
+
+    <!--
+        Enable dynamic GZip of server responses
+
+        Standard approach is to use org.eclipse.jetty.servlets.GZipFilter, the
+        javadoc describes the init-params and the conditions under which gzip encoding
+        is applied - http://download.eclipse.org/jetty/stable-7/apidocs/org/eclipse/jetty/servlets/GzipFilter.html
+
+        A more flexible approach can be gained by using org.eclipse.jetty.servlets.IncludableGzipFilter,
+        the javadoc can be found here - http://download.eclipse.org/jetty/stable-7/apidocs/org/eclipse/jetty/servlets/IncludableGzipFilter.html
+    -->
+    <!--
+    <filter>
+        <filter-name>GzipFilter</filter-name>
+
+        <filter-class>org.eclipse.jetty.servlets.IncludableGzipFilter</filter-class>
+        <!- <filter-class>org.eclipse.jetty.servlets.GzipFilter</filter-class> -!>
+
+        <!- <async-support>true</async-support> -!>
+        <init-param>
+            <param-name>bufferSize</param-name>
+            <param-value>8192</param-value>
+        </init-param>
+        <init-param>
+            <param-name>minGzipSize</param-name>
+            <param-value>2048</param-value>
+        </init-param>
+        <init-param>
+            <param-name>userAgent</param-name>
+            <param-value>(?:Mozilla[^\(]*\(compatible;\s*+([^;]*);.*)|(?:.*?([^\s]+/[^\s]+).*)</param-value>
+        </init-param>
+        <init-param>
+            <param-name>cacheSize</param-name>
+            <param-value>1024</param-value>
+        </init-param>
+        <init-param>
+            <param-name>excludedAgents</param-name>
+            <param-value>MSIE 6.0</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>GzipFilter</filter-name>
+        <url-pattern>*</url-pattern>
+    </filter-mapping>
+    -->
+</web-app>

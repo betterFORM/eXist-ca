@@ -111,8 +111,17 @@ At any time the Cert Admin can list all certs issued for a given CA.
 ### Steps
 
 ## 9. install cert
-### Actor: Cert User, Cert Admin
+To use a cert a cert user must be able to download a cert by clicking on a link in the browser or by using
+the import facility of e.g. a mail client. The system must presents a list of certs to choose from as there are
+multiple certs possible for a user and display the clickable cert items.
+
+### Actor: Cert User
 ### Steps
+1. user authenticates against cert server
+1. system display list of cert for given user (auth)
+1. user chooses a cert
+1. system returns cert with correct mime-type
+
 
 ## 10. request renewal
 ### Actor: Cert User
