@@ -4,10 +4,10 @@
 INTERFACES=/etc/network/interfaces
 
 # vars for OpenVPN on Debian
-OPENVPN_DIR=/etc/openvpn
-OPENVPN_USER=nobody
-OPENVPN_GROUP=nogroup
-OPENVPN_CHROOT=
+export OPENVPN_DIR=/etc/openvpn
+export OPENVPN_USER=nobody
+export OPENVPN_GROUP=nogroup
+export OPENVPN_CHROOT=
 
 
 ### functions for installation and setup

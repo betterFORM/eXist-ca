@@ -1,10 +1,10 @@
 #!/bin/sh 
 
 # vars for OpenVPN on OpenBSD
-OPENVPN_DIR=/etc/openvpn
-OPENVPN_USER=_openvpn
-OPENVPN_GROUP=_openvpn
-OPENVPN_CHROOT=/var/empty
+export OPENVPN_DIR=/etc/openvpn
+export OPENVPN_USER=_openvpn
+export OPENVPN_GROUP=_openvpn
+export OPENVPN_CHROOT=/var/empty
 
 
 ### functions for installation and setup
