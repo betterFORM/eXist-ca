@@ -725,7 +725,6 @@ infrastructure in order to prevent the revoked cert from being accepted.
 
 # gen-crl backend
 gen_crl() {
-set -x
 	verify_ca_init
 
 	local out_file="$EASYRSA_PKI/crl.pem"
