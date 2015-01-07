@@ -62,16 +62,16 @@ install_pkg java || err=1
 
 # fetch and install eXist software
 #cd $INSTALL_BASE && wget $EXIST_DIST && tar zxf ...
+# create /etc/rc.d/eXist script
 
 # fetch and install eXistCA xar
 #...
-
-# enable and start eXist
-#...
+# create cronjob for CRL
 
 # enable and start NTP daemon
 
 # install and start OpenVPN
 install_pkg openvpn || err=1
-
+# ensure /dev/tun device nodes
+# create /etc/rc.d/openvpn script
 
