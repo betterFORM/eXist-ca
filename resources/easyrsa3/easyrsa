@@ -725,12 +725,13 @@ infrastructure in order to prevent the revoked cert from being accepted.
 
 # gen-crl backend
 gen_crl() {
+set -x
 	verify_ca_init
 
 	local out_file="$EASYRSA_PKI/crl.pem"
         local passopt="-passin $EXISTCA_AUTHIN"
 #	"$EASYRSA_OPENSSL" ca -gencrl -out "$out_file" -config "$EASYRSA_SSL_CONF" || die "\
-	"$EASYRSA_OPENSSL" ca $passopt -out "$out_file" -config "$EASYRSA_SSL_CONF" || die "\
+	"$EASYRSA_OPENSSL" ca $passopt -gencrl -out "$out_file" -config "$EASYRSA_SSL_CONF" || die "\
 CRL Generation failed.
 "
 
