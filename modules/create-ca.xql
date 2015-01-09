@@ -6,7 +6,7 @@ import module namespace file="http://exist-db.org/xquery/file" at "java:org.exis
 
 
 let $ca-home := $existca:ca-home
-let $pki-home := $ca-home || '/pki'
+let $pki-home := $existca:pki-home
 
 let $data := request:get-data()
 
