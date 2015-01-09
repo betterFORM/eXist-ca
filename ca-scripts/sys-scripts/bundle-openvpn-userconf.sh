@@ -31,10 +31,10 @@ export REQ_ENV="\
 err=0
 
 # source common script vars (generic, not OS specific vars and functions)
-. $APPLIANCE_HOME/common.sh
+. $EXISTCA_HOME/script-vars.sh
 
 OSDIR=`determine_osdir`
-if [ -n "$OSDIR" ]; then
+if [ -z "$OSDIR" ]; then
     logmsg "ERROR - can not determine OS"
     err=1
 else
@@ -66,12 +66,14 @@ if [ $err -ne 0 ]; then
     exit 1
 fi
 
-TMPDIR=/tmp
+TMPDIR=`mktemp -d`
 CLIENT_P12=$PKI_BASE/$THIS_CA/private/${THIS_CN}.p12
-CLIENT_CONF=$OPENVPN_DIR/$THIS_VPN/${THIS_VPN}-client.ovpn
+CLIENT_CONF=$OPENVPN_DIR/$THIS_VPN/client.ovpn
 TA_KEY=$OPENVPN_DIR/$THIS_VPN/ta.key
+
+sed -e "s|CLIENT.p12|${THIS_CN}.p12|;" <$CLIENT_CONF >$TMPDIR/${THIS_VPN}.ovpn
 # 
-for f in $CLIENT_P12 $CLIENT_CONF $TA_KEY; do
+for f in $CLIENT_P12 $TA_KEY; do
     if [ -f $f ]; then
 	cp $f $TMPDIR/
     else
@@ -80,7 +82,8 @@ for f in $CLIENT_P12 $CLIENT_CONF $TA_KEY; do
     fi
 done
 
-cd $TMPDIR && zip -r openvpn-${THIS_CN}.zip * || err=1
+cd $TMPDIR && zip -r /tmp/openvpn-${THIS_CN}.zip * || err=1
+cd /tmp && rm -rf $TMPDIR
 
 # err out with exit code 1 (parameter problem)
 if [ $err -ne 0 ]; then

@@ -54,6 +54,32 @@ verify_ipaddr () {
     [[ -n "$i" ]] || ( logmsg "(FAKE) not an IP address $i"; return 1 )
 }
 
+# determine OS, release and distribution that we're running oo
+determine_osdir () {
+    os_type=`uname -s`
+    #os_release=`uname -r`
+    #os_host=`uname -n`
+
+    case "$os_type" in
+	OpenBSD)
+	    echo OpenBSD
+	    ;;
+	Linux)
+	    # determine Linux distribution
+	    [ -f /etc/debian_version ] && echo Debian
+	    ;;
+	*)
+	    logmsg "OS $os_type yet unsupported"
+	    echo ""
+	    ;;
+    esac
+}
+
+# create timestamp string fragment for backup file names
+mkbackuptimestamp () {
+    echo "save.`date '+%F-%H:%M:%S'`"
+}
+
 
 # PKCS12 export password
 #export EXISTCA_EXPORTPASS=export
