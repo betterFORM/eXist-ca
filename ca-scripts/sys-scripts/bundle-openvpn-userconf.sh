@@ -72,6 +72,7 @@ CLIENT_CONF=$OPENVPN_DIR/$THIS_VPN/client.ovpn
 TA_KEY=$OPENVPN_DIR/$THIS_VPN/ta.key
 
 sed -e "s|CLIENT.p12|${THIS_CN}.p12|;" <$CLIENT_CONF >$TMPDIR/${THIS_VPN}.ovpn
+unix2dos -n $TMPDIR/${THIS_VPN}.ovpn $TMPDIR/${THIS_VPN}-Windows.ovpn
 # 
 for f in $CLIENT_P12 $TA_KEY; do
     if [ -f $f ]; then
@@ -82,8 +83,10 @@ for f in $CLIENT_P12 $TA_KEY; do
     fi
 done
 
-cd $TMPDIR && zip -r /tmp/openvpn-${THIS_CN}.zip * || err=1
+OUTFILE=/tmp/openvpn-${THIS_CN}.zip
+cd $TMPDIR && zip -r $OUTFILE * || err=1
 cd /tmp && rm -rf $TMPDIR
+logmsg "OpenVPN config for \"$THIS_CN\" created in $OUTFILE"
 
 # err out with exit code 1 (parameter problem)
 if [ $err -ne 0 ]; then
