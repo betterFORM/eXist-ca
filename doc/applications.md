@@ -73,7 +73,24 @@ but that's out of scope for this document.
 
 ## VPN Access to Company (or Cloud) Resources via IPsec
 
-Similar to above, but support IPsec VPNs instead of OpenVPN
+Similar to above, but support IPsec VPNs instead of OpenVPN.
+
+## Encrypted Access to Closed User Group Web Services
+
+The ABC startup plans to provide confidential price lists to selected 
+resellers.  Access must be encrypted, authentication not required to keep 
+it simple. So they
+
+- reuse the existing "ABC CA" trust center (or create a new one)
+- use "ABC CA" to create one or more reseller client certificates
+- use "ABC CA" to create a server certificate for the "reseller.example.com" web server
+- configure the web server to require strong encryption and a certficate issued by "ABC CA"
+- offer a link "click here to install reseller cert"
+- certificates get installed into resellers web browser
+- reseller can access price lists
+
+
+
 
 ## Email Transport Encryption
 

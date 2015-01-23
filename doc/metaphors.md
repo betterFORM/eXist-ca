@@ -16,13 +16,8 @@ A certificate, just like a passport or ID card, is:
 - that document is stamped and signed by some authority (government)
 - it is valid for some years and needs to be renewed afterwards
 - you need to possess and show it, and it must be valid, to access restricted 
-  resourcea (travel to a foreign country)
-- the person holding the passport needs to interact with the authority (government):
-- apply for a passport
-- passport gets issued by the authority
-- pickup and use new passport
-- renew passport when it expires
-- passport gets revoked by the authority (if stolen)
+  resources (travel to a foreign country)
+- the person holding the passport needs to interact with the authority (government): apply for a passport; passport gets issued by the authority; pickup and use new passport; renew passport when it expires; passport gets revoked by the authority (if stolen)
 
 Although X.509 certificates have a strong similarity to passports, there 
 are some differences:
@@ -51,6 +46,15 @@ internally or something functionally equivalent]
 [...]
 
 ## Certificates have similarities to bank and credit cards
+
+This metaphor is a bit different.
+
+Assume that the data you protect maps to monetary values (think research 
+data or engineering drawings). If some of this data gets stolen, you loose 
+money.  Just like your bank account.
+
+
+
 
 [...]
 
