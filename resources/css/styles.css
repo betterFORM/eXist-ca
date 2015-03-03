@@ -80,6 +80,9 @@ input.form-control {
 .xfRequired > .xfLabel:after {
   color: white;
 }
+.xfRequiredEmpty:after {
+  display: none;
+}
 .btn-group {
   text-align: center;
   width: 100%;
@@ -231,6 +234,7 @@ input.form-control {
   display: inline-block;
   width: 100%;
   text-shadow: -2px 1px 1px #ca9b13, -2px 1px 1px #c99a12;
+  border: none;
 }
 #summary .xfOutput label.xfLabel {
   font-size: 0.8em;

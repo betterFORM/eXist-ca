@@ -59,7 +59,7 @@
                         <xf:toggle case="home"/>
                     </xf:action>
                 </xf:submission>
-                <xf:submission id="s-config-jetty" ref="instance('i-default')" method="post" replace="instance" contentType="text/xml" resource="{$contextPath}/modules/create-cert.xql">
+                <xf:submission id="s-config-jetty" ref="instance('i-default')" method="post" replace="instance" contentType="text/xml" resource="{$contextPath}/modules/reconfig-jetty.xql">
                     <xf:action ev:event="xforms-submit-error">
                         <xf:message level="ephemeral">An Error occurred during creation of cert for your server '<xf:output ref="dnsname"/>'</xf:message>
                     </xf:action>
